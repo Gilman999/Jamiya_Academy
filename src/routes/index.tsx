@@ -3,6 +3,7 @@ import { useState } from "react";
 import heroPattern from "@/assets/hero-pattern.jpg";
 import { ScrollEffects } from "@/components/scroll-effects";
 import { Navbar } from "@/components/navbar";
+import { PortalModals } from "@/components/portal-modals";
 
 const WHATSAPP_URL = "https://wa.me/919368324180?text=Assalamu%20Alaikum%2C%20I%20want%20to%20take%20admission%20in%20Jamiya%20Kaneez%20E%20Sayyeda%20Fatima%20Academy";
 const PHONE = "+91 93683 24180";
@@ -51,13 +52,15 @@ export const Route = createFileRoute("/")({
 });
 
 export function Home() {
+  const [activeModal, setActiveModal] = useState<"results" | "certificates" | "notices" | null>(null);
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-accent/30 selection:text-primary">
       <ScrollEffects />
       <Navbar />
       <Hero />
       <Announcement />
-      <WhyChooseUs />
+      <WhyChooseUs onOpenModal={(m) => setActiveModal(m)} />
       <Courses />
       <SkillJourneySection />
       <Library />
@@ -65,6 +68,7 @@ export function Home() {
       <HowWeTeachSection />
       <Contact />
       <Footer />
+      <PortalModals activeModal={activeModal} onClose={() => setActiveModal(null)} />
     </div>
   );
 }
@@ -160,7 +164,7 @@ function Announcement() {
   );
 }
 
-function WhyChooseUs() {
+function WhyChooseUs({ onOpenModal }: { onOpenModal?: (m: "results" | "certificates" | "notices") => void }) {
   const reasons = [
     {
       no: "01",
@@ -226,7 +230,42 @@ function WhyChooseUs() {
           description="Dedicated to providing authentic Islamic knowledge, practical skill development, and language fluency in a safe, female-led environment."
         />
 
-        <div className="relative mt-14 py-px">
+        {/* Quick Access Features & Portals Bar (ADMISSION, RESULTS, CERTIFICATES, NOTICE BOARD) */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 relative z-20" data-reveal>
+          <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-semibold">Quick Portals:</span>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.open(WHATSAPP_URL, "_blank")}
+              className="px-4 py-2 rounded-full border border-border bg-card text-xs font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent hover:text-[#162E25] hover:border-accent transition-all cursor-pointer shadow-xs"
+            >
+              ADMISSION →
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenModal?.("results")}
+              className="px-4 py-2 rounded-full border border-border bg-card text-xs font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent hover:text-[#162E25] hover:border-accent transition-all cursor-pointer shadow-xs"
+            >
+              RESULTS
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenModal?.("certificates")}
+              className="px-4 py-2 rounded-full border border-border bg-card text-xs font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent hover:text-[#162E25] hover:border-accent transition-all cursor-pointer shadow-xs"
+            >
+              CERTIFICATES
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenModal?.("notices")}
+              className="px-4 py-2 rounded-full border border-border bg-card text-xs font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent hover:text-[#162E25] hover:border-accent transition-all cursor-pointer shadow-xs"
+            >
+              NOTICE BOARD
+            </button>
+          </div>
+        </div>
+
+        <div className="relative mt-12 py-px">
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 relative z-0 divide-y divide-border/60 sm:divide-y-0">
             {reasons.map((r) => (

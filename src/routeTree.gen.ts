@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdmissionRouteImport } from './routes/admission'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as LibraryRouteImport } from './routes/library'
 
@@ -30,6 +31,11 @@ const AdmissionRoute = AdmissionRouteImport.update({
   path: '/admission',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admission': typeof AdmissionRoute
+  '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/library': typeof LibraryRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admission': typeof AdmissionRoute
+  '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/library': typeof LibraryRoute
 }
@@ -60,21 +68,31 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admission': typeof AdmissionRoute
+  '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/library': typeof LibraryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/admission' | '/gallery' | '/library'
+  fullPaths:
+    '/' | '/about' | '/admission' | '/contact' | '/gallery' | '/library'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admission' | '/gallery' | '/library'
-  id: '__root__' | '/' | '/about' | '/admission' | '/gallery' | '/library'
+  to: '/' | '/about' | '/admission' | '/contact' | '/gallery' | '/library'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admission'
+    | '/contact'
+    | '/gallery'
+    | '/library'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdmissionRoute: typeof AdmissionRoute
+  ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
   LibraryRoute: typeof LibraryRoute
 }
@@ -102,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdmissionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gallery': {
       id: '/gallery'
       path: '/gallery'
@@ -123,6 +148,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdmissionRoute: AdmissionRoute,
+  ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
   LibraryRoute: LibraryRoute,
 }

@@ -15,7 +15,7 @@ export function Navbar() {
     { href: "/library", label: "LIBRARY" },
     { href: "/#why-choose-us", label: "FEATURES", isDropdown: true },
     { href: "/gallery", label: "GALLERY" },
-    { href: "/#contact", label: "CONTACT" },
+    { href: "/contact", label: "CONTACT" },
   ];
 
   const dropdownItems = [

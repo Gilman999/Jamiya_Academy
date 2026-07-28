@@ -431,8 +431,7 @@ export function LibraryPage() {
               {filteredResources.map((res) => (
                 <div
                   key={res.id}
-                  className="bg-card border border-border/80 p-6 sm:p-7 flex flex-col justify-between space-y-6 shadow-xs hover:border-accent transition-all group relative"
-                  data-reveal
+                  className="bg-card border border-border/80 p-6 sm:p-7 flex flex-col justify-between space-y-6 shadow-xs hover:border-accent transition-all group relative animate-in fade-in duration-300"
                 >
                   <div>
                     {/* Top Badges */}

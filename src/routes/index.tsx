@@ -230,17 +230,18 @@ function WhyChooseUs({ onOpenModal }: { onOpenModal?: (m: "results" | "certifica
           description="Dedicated to providing authentic Islamic knowledge, practical skill development, and language fluency in a safe, female-led environment."
         />
 
-        <div className="relative mt-14 py-px">
+        <div className="relative mt-10 sm:mt-14 py-px">
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 relative z-0 divide-y divide-border/60 sm:divide-y-0">
+          {/* Swipeable Horizontally on Mobile */}
+          <div className="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 lg:pb-0 relative z-0">
             {reasons.map((r) => (
               <div
                 key={r.no}
-                className="p-6 sm:p-7 relative"
+                className="w-[80vw] sm:w-auto max-w-[300px] lg:max-w-none shrink-0 lg:shrink snap-center bg-card border border-border/80 p-6 rounded-xs lg:border-none lg:bg-transparent lg:p-7 relative"
                 data-reveal
               >
                 <span className="font-serif text-xs text-accent font-semibold">{r.no}</span>
-                <h3 className="mt-2 font-serif text-xl text-primary">{r.title}</h3>
+                <h3 className="mt-2 font-serif text-xl text-primary font-medium">{r.title}</h3>
                 <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{r.desc}</p>
               </div>
             ))}

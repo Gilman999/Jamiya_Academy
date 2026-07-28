@@ -352,33 +352,33 @@ export function LibraryPage() {
             <div className="h-px w-12 bg-accent/40" />
           </div>
 
-          <h1 className="font-serif text-4xl text-primary sm:text-5xl md:text-6xl font-medium leading-tight" data-reveal>
+          <h1 className="font-serif text-2xl sm:text-4xl md:text-6xl text-primary font-medium leading-tight" data-reveal>
             Digital Library & Resource Hub
           </h1>
 
-          <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed" data-reveal data-reveal-delay="1">
+          <p className="mx-auto mt-3 max-w-xl text-xs sm:text-base text-muted-foreground leading-relaxed" data-reveal data-reveal-delay="1">
             Free authentic Islamic PDF books, Tajweed guides, daily Masnoon Duas, and study worksheets curated by female scholars.
           </p>
 
           {/* SEARCH BAR */}
-          <div className="mt-10 max-w-2xl mx-auto relative" data-reveal data-reveal-delay="2">
+          <div className="mt-8 max-w-2xl mx-auto relative" data-reveal data-reveal-delay="2">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search books, Tajweed rules, Hadith, Duas, or worksheets..."
-              className="w-full rounded-full border-2 border-border/80 bg-card px-7 py-4 pr-12 text-sm text-primary placeholder:text-muted-foreground/60 shadow-xs focus:border-accent focus:outline-none transition-colors"
+              className="w-full rounded-full border-2 border-border/80 bg-card px-5 py-3 sm:px-7 sm:py-4 pr-12 text-xs sm:text-sm text-primary placeholder:text-muted-foreground/60 shadow-xs focus:border-accent focus:outline-none transition-colors"
             />
             {searchQuery ? (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground hover:text-primary uppercase tracking-widest"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground hover:text-primary uppercase tracking-widest"
               >
                 Clear
               </button>
             ) : (
-              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground/50 text-base">
+              <span className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground/50 text-sm sm:text-base">
                 🔍
               </span>
             )}
@@ -387,17 +387,17 @@ export function LibraryPage() {
       </section>
 
       {/* MAIN LIBRARY CONTENT */}
-      <section className="py-12 sm:py-20 bg-[#F7F4EE]">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 space-y-10">
+      <section className="py-10 sm:py-20 bg-[#F7F4EE]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 space-y-8">
           
-          {/* CATEGORY FILTER TABS */}
-          <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-none" data-reveal>
+          {/* CATEGORY FILTER TABS — Touch Scrollable on Mobile */}
+          <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto snap-x scrollbar-none pb-2 -mx-4 px-4 sm:mx-0 sm:px-0" data-reveal>
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCategory(cat.id as Resource["category"])}
-                className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.18em] whitespace-nowrap transition-all ${
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[11px] sm:text-xs font-semibold uppercase tracking-[0.18em] whitespace-nowrap transition-all cursor-pointer snap-center ${
                   selectedCategory === cat.id
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-card border border-border/70 text-muted-foreground hover:text-primary hover:border-accent"
@@ -409,7 +409,7 @@ export function LibraryPage() {
           </div>
 
           {/* RESULTS COUNT & FILTER RESET */}
-          <div className="flex items-center justify-between border-b border-border/60 pb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3 text-[11px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground">
             <span>Showing {filteredResources.length} of {RESOURCES.length} Resources</span>
             {(selectedCategory !== "all" || searchQuery) && (
               <button
@@ -425,13 +425,13 @@ export function LibraryPage() {
             )}
           </div>
 
-          {/* RESOURCE CARDS GRID */}
+          {/* RESOURCE CARDS GRID — Swipeable Horizontally on Mobile */}
           {filteredResources.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 md:pb-0">
               {filteredResources.map((res) => (
                 <div
                   key={res.id}
-                  className="bg-card border border-border/80 p-6 sm:p-7 flex flex-col justify-between space-y-6 shadow-xs hover:border-accent transition-all group relative animate-in fade-in duration-300"
+                  className="w-[82vw] sm:w-auto max-w-[320px] md:max-w-none shrink-0 md:shrink snap-center bg-card border border-border/80 p-6 sm:p-7 flex flex-col justify-between space-y-6 shadow-xs hover:border-accent transition-all group relative animate-in fade-in duration-300"
                 >
                   <div>
                     {/* Top Badges */}

@@ -95,20 +95,20 @@ function AboutHero() {
           ACADEMY HERITAGE & MISSION
         </p>
         
-        <h1 className="mt-4 font-serif text-4xl text-primary sm:text-6xl md:text-7xl font-medium leading-tight" data-reveal data-reveal-delay="1">
+        <h1 className="mt-4 font-serif text-2xl sm:text-5xl md:text-7xl text-primary font-medium leading-tight" data-reveal data-reveal-delay="1">
           Nurturing Faith, Knowledge & Character
         </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-muted-foreground font-sans" data-reveal data-reveal-delay="2">
+        <p className="mx-auto mt-4 max-w-2xl text-xs sm:text-lg leading-relaxed text-muted-foreground font-sans" data-reveal data-reveal-delay="2">
           Founded under State Government accreditation by qualified female scholars, Jamiya Kaneez E Sayyeda Fatima Lilbanat ﷺ is an exclusive sanctuary dedicated to authentic Islamic learning and female empowerment.
         </p>
 
         {/* Stats Grid */}
-        <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 pt-10 border-t border-border/60" data-reveal data-reveal-delay="3">
+        <div className="mt-12 sm:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-8 sm:pt-10 border-t border-border/60" data-reveal data-reveal-delay="3">
           {stats.map((s, idx) => (
-            <div key={idx} className="p-4 text-center">
-              <p className="font-serif text-4xl sm:text-5xl text-primary font-medium">{s.value}</p>
-              <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground font-medium">{s.label}</p>
+            <div key={idx} className="p-3 sm:p-4 text-center">
+              <p className="font-serif text-3xl sm:text-5xl text-primary font-medium">{s.value}</p>
+              <p className="mt-1.5 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground font-medium">{s.label}</p>
             </div>
           ))}
         </div>
@@ -120,50 +120,50 @@ function AboutHero() {
 {/* 2. FOUNDER'S VISION SECTION */}
 function FoundersVision() {
   return (
-    <section className="relative border-b border-border/60 py-20 sm:py-28 bg-[#F7F4EE]">
+    <section className="relative border-b border-border/60 py-16 sm:py-28 bg-[#F7F4EE]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Calligraphy & Founder Card */}
           <div className="lg:col-span-5 relative" data-reveal>
-            <div className="bg-card border-2 border-accent/40 p-8 sm:p-10 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 translate-x-4 -translate-y-4 text-accent/10 font-ruqaa text-9xl pointer-events-none select-none">
+            <div className="bg-card border-2 border-accent/40 p-6 sm:p-10 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 translate-x-4 -translate-y-4 text-accent/10 font-ruqaa text-8xl sm:text-9xl pointer-events-none select-none">
                 فاطمة
               </div>
 
               <span className="text-[10px] uppercase tracking-[0.3em] text-accent font-bold">ACADEMY FOUNDER</span>
-              <h3 className="mt-2 font-serif text-3xl text-primary font-medium">Fatima Ali Hashmi</h3>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mt-1">Founder & Chief Academic Directress</p>
+              <h3 className="mt-2 font-serif text-2xl sm:text-3xl text-primary font-medium">Fatima Ali Hashmi</h3>
+              <p className="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground mt-1">Founder & Chief Academic Directress</p>
 
-              <div className="my-6 h-px w-16 bg-accent" />
+              <div className="my-4 sm:my-6 h-px w-16 bg-accent" />
 
               <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed italic">
                 &ldquo;Ilm-e-Deen is a sacred right upon every female. Our mission is to make authentic knowledge accessible to every home, preserving Islamic adab, complete parda, and dignity while imparting high-value modern skills.&rdquo;
               </p>
 
               <div className="mt-6 pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="font-ruqaa text-lg text-accent">جامعہ کنیزِ سیّدہ فاطمہ</span>
+                <span className="font-ruqaa text-base sm:text-lg text-accent">جامعہ کنیزِ سیّدہ فاطمہ</span>
                 <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">State Registered</span>
               </div>
             </div>
           </div>
 
           {/* Right Vision Narrative */}
-          <div className="lg:col-span-7 space-y-6" data-reveal data-reveal-delay="2">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6" data-reveal data-reveal-delay="2">
             <p className="text-xs uppercase tracking-[0.3em] text-accent font-semibold">OUR GUIDING PHILOSOPHY</p>
-            <h2 className="font-serif text-3xl sm:text-4xl text-primary font-medium leading-tight">
+            <h2 className="font-serif text-2xl sm:text-4xl text-primary font-medium leading-tight">
               A Safe Sanctuary for Women & Children to Flourish
             </h2>
 
-            <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
+            <p className="text-xs sm:text-base leading-relaxed text-muted-foreground">
               Jamiya Kaneez E Sayyeda Fatima Lilbanat ﷺ was established with a singular noble purpose: to provide girls, women, and children with a dignified environment where they can acquire authentic Islamic education without compromising on modesty, safety, or personal obligations.
             </p>
 
-            <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
+            <p className="text-xs sm:text-base leading-relaxed text-muted-foreground">
               Whether studying traditional Alimiyya coursework or mastering modern vocational trades like fashion design, calligraphy, and digital media editing, our students receive direct mentorship from qualified female teachers who embody Islamic character and academic excellence.
             </p>
 
-            <div className="pt-4 grid sm:grid-cols-2 gap-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <div className="pt-2 grid sm:grid-cols-2 gap-3 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               <div className="flex items-center gap-2">
                 <span className="text-accent">✓</span> 100% Female Teachers & Staff
               </div>
@@ -211,7 +211,7 @@ function CorePillars() {
   ];
 
   return (
-    <section className="relative border-b border-border/60 py-20 sm:py-28 bg-[#FBF9F5]">
+    <section className="relative border-b border-border/60 py-16 sm:py-28 bg-[#FBF9F5]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeader
           eyebrow="ACADEMY PILLARS"
@@ -219,19 +219,20 @@ function CorePillars() {
           description="Our structured educational framework integrates sacred Islamic tradition with practical life skills."
         />
 
-        <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Swipeable Horizontally on Mobile */}
+        <div className="mt-12 sm:mt-16 flex lg:grid lg:grid-cols-4 gap-5 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 lg:pb-0">
           {pillars.map((p) => (
             <div
               key={p.no}
-              className="bg-card border border-border/80 p-8 flex flex-col justify-between space-y-6 shadow-xs hover:border-accent transition-all group"
+              className="w-[82vw] sm:w-auto max-w-[320px] lg:max-w-none shrink-0 lg:shrink snap-center bg-card border border-border/80 p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs hover:border-accent transition-all group"
               data-reveal
             >
               <div>
-                <span className="font-serif text-sm text-accent font-bold uppercase tracking-[0.25em]">{p.no}</span>
-                <h3 className="mt-4 font-serif text-2xl text-primary font-medium group-hover:text-accent transition-colors">
+                <span className="font-serif text-xs sm:text-sm text-accent font-bold uppercase tracking-[0.25em]">{p.no}</span>
+                <h3 className="mt-3 font-serif text-xl sm:text-2xl text-primary font-medium group-hover:text-accent transition-colors">
                   {p.title}
                 </h3>
-                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
+                <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
               </div>
 
               <div className="pt-4 border-t border-border/40">

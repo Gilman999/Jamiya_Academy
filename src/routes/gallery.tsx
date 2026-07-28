@@ -175,22 +175,22 @@ export function GalleryPage() {
             <div className="h-px w-12 bg-accent/40" />
           </div>
 
-          <h1 className="font-serif text-4xl text-primary sm:text-5xl md:text-6xl font-medium leading-tight" data-reveal>
+          <h1 className="font-serif text-2xl sm:text-4xl md:text-6xl text-primary font-medium leading-tight" data-reveal>
             Academy Moments & Gallery
           </h1>
 
-          <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed" data-reveal data-reveal-delay="1">
+          <p className="mx-auto mt-3 max-w-xl text-xs sm:text-base text-muted-foreground leading-relaxed" data-reveal data-reveal-delay="1">
             Visual archives of Quranic study halqas in complete parda, Arabic calligraphy exhibitions, fashion design craft, and convocation honors.
           </p>
 
-          {/* CATEGORY FILTER PILLS */}
-          <div className="mt-10 flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-none" data-reveal data-reveal-delay="2">
+          {/* CATEGORY FILTER PILLS — Scrollable Mobile Carousel */}
+          <div className="mt-8 flex items-center justify-start sm:justify-center gap-2 overflow-x-auto snap-x scrollbar-none pb-2 -mx-4 px-4 sm:mx-0 sm:px-0" data-reveal data-reveal-delay="2">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCategory(cat.id as GalleryItem["category"])}
-                className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.18em] whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[11px] sm:text-xs font-semibold uppercase tracking-[0.18em] whitespace-nowrap transition-all cursor-pointer snap-center ${
                   selectedCategory === cat.id
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-card border border-border/70 text-muted-foreground hover:text-primary hover:border-accent"
@@ -203,11 +203,11 @@ export function GalleryPage() {
         </div>
       </section>
 
-      {/* BENTO GRID GALLERY SECTION */}
-      <section className="py-16 sm:py-24 bg-[#F7F4EE]">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      {/* BENTO GRID GALLERY SECTION — Responsive Bento Grid on Mobile */}
+      <section className="py-10 sm:py-24 bg-[#F7F4EE]">
+        <div className="mx-auto max-w-6xl px-3 sm:px-6">
           
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px] sm:auto-rows-[220px]">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 auto-rows-[130px] sm:auto-rows-[180px] lg:auto-rows-[220px]">
             {filteredItems.map((item) => (
               <div
                 key={item.id}
@@ -225,15 +225,15 @@ export function GalleryPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 {/* Minimal Single Text Tag Badge */}
-                <div className="absolute top-3 left-3 z-10">
-                  <span className="bg-[#162E25]/85 backdrop-blur-xs text-accent text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-accent/40 shadow-sm">
+                <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
+                  <span className="bg-[#162E25]/85 backdrop-blur-xs text-accent text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 sm:px-3 sm:py-1 rounded-full border border-accent/40 shadow-sm truncate max-w-[130px] sm:max-w-none block">
                     {item.shortTag}
                   </span>
                 </div>
 
                 {/* Minimal Title Bar on Hover */}
-                <div className="absolute bottom-0 inset-x-0 p-4 z-10 text-white translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <h3 className="font-serif text-base font-medium text-white group-hover:text-accent transition-colors leading-snug">
+                <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 z-10 text-white translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <h3 className="font-serif text-xs sm:text-base font-medium text-white group-hover:text-accent transition-colors leading-snug">
                     {item.title}
                   </h3>
                 </div>

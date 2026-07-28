@@ -81,27 +81,27 @@ export function ContactPage() {
             <div className="h-px w-12 bg-accent/40" />
           </div>
 
-          <h1 className="font-serif text-4xl text-primary sm:text-5xl md:text-6xl font-medium leading-tight" data-reveal>
+          <h1 className="font-serif text-2xl sm:text-4xl md:text-6xl text-primary font-medium leading-tight" data-reveal>
             Get in Touch With Us
           </h1>
 
-          <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed" data-reveal data-reveal-delay="1">
+          <p className="mx-auto mt-3 max-w-xl text-xs sm:text-base text-muted-foreground leading-relaxed" data-reveal data-reveal-delay="1">
             Have questions regarding admissions, fees, course timings, or online/offline learning? Our female administration team is here to assist you.
           </p>
         </div>
       </section>
 
-      {/* QUICK CONTACT CARDS */}
-      <section className="py-12 sm:py-16 bg-[#F7F4EE] border-b border-border/60">
+      {/* QUICK CONTACT CARDS — Swipeable Horizontally on Mobile */}
+      <section className="py-10 sm:py-16 bg-[#F7F4EE] border-b border-border/60">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto sm:overflow-visible snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 sm:pb-0">
             
             {/* Card 1 - WhatsApp */}
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
+              className="w-[80vw] sm:w-auto max-w-[300px] sm:max-w-none shrink-0 sm:shrink snap-center bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
               data-reveal
             >
               <div>
@@ -122,7 +122,7 @@ export function ContactPage() {
             {/* Card 2 - Phone Call */}
             <a
               href={`tel:${PHONE_TEL}`}
-              className="bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
+              className="w-[80vw] sm:w-auto max-w-[300px] sm:max-w-none shrink-0 sm:shrink snap-center bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
               data-reveal
               data-reveal-delay="1"
             >
@@ -144,7 +144,7 @@ export function ContactPage() {
             {/* Card 3 - Email */}
             <a
               href={`mailto:${EMAIL}`}
-              className="bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
+              className="w-[80vw] sm:w-auto max-w-[300px] sm:max-w-none shrink-0 sm:shrink snap-center bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
               data-reveal
               data-reveal-delay="2"
             >
@@ -165,7 +165,7 @@ export function ContactPage() {
 
             {/* Card 4 - Campus Address */}
             <div
-              className="bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
+              className="w-[80vw] sm:w-auto max-w-[300px] sm:max-w-none shrink-0 sm:shrink snap-center bg-card border border-border/80 p-6 rounded-xs hover:border-accent transition-all group shadow-xs flex flex-col justify-between space-y-4"
               data-reveal
               data-reveal-delay="3"
             >

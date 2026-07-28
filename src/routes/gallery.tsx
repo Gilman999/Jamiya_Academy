@@ -13,7 +13,7 @@ export const Route = createFileRoute("/gallery")({
       {
         name: "description",
         content:
-          "Explore the visual gallery of Jamiya Academy — Quranic recitations, Arabic calligraphy exhibitions, fashion design showcases, and campus events.",
+          "Explore the visual gallery of Jamiya Academy — Quranic recitations, female student halqas in parda, Arabic calligraphy exhibitions, and campus events.",
       },
       { property: "og:title", content: "Campus & Creative Arts Gallery — Jamiya Academy" },
     ],
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/gallery")({
 type GalleryItem = {
   id: string;
   title: string;
+  shortTag: string;
   category: "all" | "calligraphy" | "campus" | "fashion" | "awards";
   categoryLabel: string;
   date: string;
@@ -35,91 +36,111 @@ type GalleryItem = {
 const GALLERY_ITEMS: GalleryItem[] = [
   {
     id: "gal-1",
-    title: "Arabic Calligraphy & Typography Masterclass",
-    category: "calligraphy",
-    categoryLabel: "Calligraphy & Art",
+    title: "Student Tajweed & Quran Recitation Halqa",
+    shortTag: "✦ Student Parda Halqa",
+    category: "campus",
+    categoryLabel: "Campus Life",
     date: "12 May 2026",
-    image: calligraphyBg,
-    spanClass: "md:col-span-2 md:row-span-2 min-h-[360px]",
+    image: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=1200&auto=format&fit=crop",
+    spanClass: "lg:col-span-2 lg:row-span-2 min-h-[340px]",
     description:
-      "Students practicing Thuluth and Naskh scripts using authentic reed pens and traditional inks under expert Qariya direction.",
+      "Alima students studying Quran recitations in complete Islamic modesty, parda, and quiet devotion.",
   },
   {
     id: "gal-2",
-    title: "Sacred Quran Recitation & Tajweed Halqa",
-    category: "campus",
-    categoryLabel: "Campus Life",
+    title: "Arabic Calligraphy & Thuluth Script",
+    shortTag: "✦ Calligraphy Art",
+    category: "calligraphy",
+    categoryLabel: "Calligraphy & Art",
     date: "04 April 2026",
-    image: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1200&auto=format&fit=crop",
-    spanClass: "md:col-span-1 md:row-span-1 min-h-[220px]",
+    image: calligraphyBg,
+    spanClass: "lg:col-span-1 lg:row-span-1 min-h-[200px]",
     description:
-      "Daily morning Tajweed halqa where Alima students revise Makharij and recitations before live lectures.",
+      "Traditional Arabic calligraphy artwork created using reed pens and golden ink.",
   },
   {
     id: "gal-3",
-    title: "Fashion Designing & Pattern Making Workshop",
+    title: "Fashion Designing & Abaya Tailoring",
+    shortTag: "✦ Fashion & Tailoring",
     category: "fashion",
     categoryLabel: "Fashion & Craft",
     date: "18 March 2026",
     image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=1200&auto=format&fit=crop",
-    spanClass: "md:col-span-1 md:row-span-1 min-h-[220px]",
+    spanClass: "lg:col-span-1 lg:row-span-1 min-h-[200px]",
     description:
-      "Handcrafted Abaya tailoring, fabric pattern cutting, and modest fashion embroidery by skill department students.",
+      "Handcrafted modesty fashion, fabric pattern drafting, and custom tailoring skills.",
   },
   {
     id: "gal-4",
     title: "Academy Library & Research Sanctuary",
+    shortTag: "✦ Library Vault",
     category: "campus",
     categoryLabel: "Campus Life",
     date: "22 February 2026",
     image: "https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1200&auto=format&fit=crop",
-    spanClass: "md:col-span-1 md:row-span-2 min-h-[340px]",
+    spanClass: "lg:col-span-2 lg:row-span-1 min-h-[200px]",
     description:
-      "Our serene digital & physical reference library storing authentic Fiqh commentaries, Hadith lexicons, and study notes.",
+      "Our quiet research library storing rare Islamic manuscripts, Fiqh books, and study guides.",
   },
   {
     id: "gal-5",
-    title: "Annual Alimiyya Convocation & Honor Ceremony",
-    category: "awards",
-    categoryLabel: "Awards & Functions",
+    title: "Islamic Geometric Architecture & Illumination",
+    shortTag: "✦ Academy Sanctuary",
+    category: "campus",
+    categoryLabel: "Campus Life",
     date: "10 January 2026",
-    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1200&auto=format&fit=crop",
-    spanClass: "md:col-span-2 md:row-span-1 min-h-[240px]",
+    image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1200&auto=format&fit=crop",
+    spanClass: "lg:col-span-1 lg:row-span-2 min-h-[340px]",
     description:
-      "Felicitation of graduating Alimahs and Sanad awardees under the directorship of Fatima Ali Hashmi.",
+      "Architectural dome, geometric tiles, and spiritual ambiance at the academy campus.",
   },
   {
     id: "gal-6",
-    title: "Islamic Geometric Art & Illumination",
-    category: "calligraphy",
-    categoryLabel: "Calligraphy & Art",
+    title: "Masnoon Duas & Daily Azkar Study Desk",
+    shortTag: "✦ Daily Azkar",
+    category: "campus",
+    categoryLabel: "Campus Life",
     date: "05 November 2025",
-    image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1200&auto=format&fit=crop",
-    spanClass: "md:col-span-1 md:row-span-1 min-h-[220px]",
+    image: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1200&auto=format&fit=crop",
+    spanClass: "lg:col-span-1 lg:row-span-1 min-h-[200px]",
     description:
-      "Traditional tezhib illumination motifs created by calligraphy diploma students using gold leaf technique.",
+      "Quiet study desk equipped with Quran, Tasbih, and daily Masnoon prayer guides.",
   },
   {
     id: "gal-7",
-    title: "Handmade Embroidery & Textile Craft",
-    category: "fashion",
-    categoryLabel: "Fashion & Craft",
+    title: "Annual Convocation & Alima Sanad Ceremony",
+    shortTag: "✦ Convocation Awards",
+    category: "awards",
+    categoryLabel: "Awards & Functions",
     date: "14 October 2025",
-    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
-    spanClass: "md:col-span-1 md:row-span-1 min-h-[220px]",
+    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1200&auto=format&fit=crop",
+    spanClass: "lg:col-span-2 lg:row-span-1 min-h-[200px]",
     description:
-      "Zardozi needlework and intricate hand embroidery exhibition created by vocational skill trainees.",
+      "Official certificate distribution for graduating female scholars and diploma holders.",
   },
   {
     id: "gal-8",
-    title: "Interactive Classroom & Digital Broadcast Studio",
-    category: "campus",
-    categoryLabel: "Campus Life",
+    title: "Handmade Zardozi Embroidery & Craft",
+    shortTag: "✦ Zardozi Craft",
+    category: "fashion",
+    categoryLabel: "Fashion & Craft",
     date: "01 September 2025",
-    image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop",
-    spanClass: "md:col-span-1 md:row-span-1 min-h-[220px]",
+    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200&auto=format&fit=crop",
+    spanClass: "lg:col-span-1 lg:row-span-1 min-h-[200px]",
     description:
-      "Broadcast setup for streaming live online classes to female students across 12 countries.",
+      "Handcrafted embroidery and intricate thread work created by vocational skill trainees.",
+  },
+  {
+    id: "gal-9",
+    title: "Alimiyya Manuscripts & Farz Uloom Textbooks",
+    shortTag: "✦ Fiqh Manuscripts",
+    category: "calligraphy",
+    categoryLabel: "Calligraphy & Art",
+    date: "20 August 2025",
+    image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1200&auto=format&fit=crop",
+    spanClass: "lg:col-span-2 lg:row-span-1 min-h-[200px]",
+    description:
+      "Classical Islamic textbooks and notes studied during 5-year Alimiyya coursework.",
   },
 ];
 
@@ -134,8 +155,8 @@ export function GalleryPage() {
 
   const categories = [
     { id: "all", label: "All Moments" },
+    { id: "campus", label: "Campus & Parda Halqas" },
     { id: "calligraphy", label: "Calligraphy & Art" },
-    { id: "campus", label: "Campus & Classrooms" },
     { id: "fashion", label: "Fashion & Craft" },
     { id: "awards", label: "Awards & Functions" },
   ];
@@ -159,7 +180,7 @@ export function GalleryPage() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed" data-reveal data-reveal-delay="1">
-            Glimpses of daily Quranic study halqas, Arabic calligraphy exhibitions, fashion design showcases, and annual convocation ceremonies.
+            Visual archives of Quranic study halqas in complete parda, Arabic calligraphy exhibitions, fashion design craft, and convocation honors.
           </p>
 
           {/* CATEGORY FILTER PILLS */}
@@ -186,41 +207,35 @@ export function GalleryPage() {
       <section className="py-16 sm:py-24 bg-[#F7F4EE]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 auto-rows-[220px]">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px] sm:auto-rows-[220px]">
             {filteredItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => setActiveLightbox(item)}
                 className={`group relative overflow-hidden rounded-xs border border-border/80 bg-card shadow-sm cursor-pointer transition-all duration-300 hover:shadow-2xl hover:border-accent ${item.spanClass} animate-in fade-in duration-300`}
               >
-                {/* Image Background */}
+                {/* Clean Image Background */}
                 <img
                   src={item.image}
                   alt={item.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
-                {/* Glassmorphism Dark Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-300" />
+                {/* Subtle Hover Shadow Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                {/* Top Badge */}
-                <div className="absolute top-4 left-4 z-10">
-                  <span className="bg-accent text-[#162E25] text-[9px] font-bold uppercase tracking-[0.25em] px-3 py-1 rounded-full shadow-xs">
-                    {item.categoryLabel}
+                {/* Minimal Single Text Tag Badge */}
+                <div className="absolute top-3 left-3 z-10">
+                  <span className="bg-[#162E25]/85 backdrop-blur-xs text-accent text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-accent/40 shadow-sm">
+                    {item.shortTag}
                   </span>
                 </div>
 
-                {/* Bottom Content Bar */}
-                <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 z-10 flex flex-col justify-end text-white space-y-1.5 translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-accent/90 font-medium">
-                    {item.date}
-                  </span>
-                  <h3 className="font-serif text-lg sm:text-xl font-medium leading-snug text-white group-hover:text-accent transition-colors">
+                {/* Minimal Title Bar on Hover */}
+                <div className="absolute bottom-0 inset-x-0 p-4 z-10 text-white translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <h3 className="font-serif text-base font-medium text-white group-hover:text-accent transition-colors leading-snug">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-white/70 line-clamp-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {item.description}
-                  </p>
                 </div>
               </div>
             ))}
@@ -244,7 +259,7 @@ export function GalleryPage() {
               <button
                 type="button"
                 onClick={() => setActiveLightbox(null)}
-                className="absolute top-4 right-4 z-20 text-white bg-black/60 hover:bg-black text-lg font-bold w-9 h-9 rounded-full flex items-center justify-center border border-white/20 transition-colors"
+                className="absolute top-4 right-4 z-20 text-white bg-black/60 hover:bg-black text-lg font-bold w-9 h-9 rounded-full flex items-center justify-center border border-white/20 transition-colors cursor-pointer"
                 aria-label="Close image lightbox"
               >
                 ✕
@@ -280,7 +295,7 @@ export function GalleryPage() {
               <button
                 type="button"
                 onClick={() => setActiveLightbox(null)}
-                className="px-6 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-all"
+                className="px-6 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-all cursor-pointer"
               >
                 Close Preview
               </button>

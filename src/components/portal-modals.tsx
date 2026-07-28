@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const WHATSAPP_URL = "https://wa.me/919368324180?text=Assalamu%20Alaikum%2C%20I%20want%20to%20verify%20my%20result%20or%20certificate";
 
-type ModalType = "results" | "certificates" | "notices" | null;
+type ModalType = "results" | "certificates" | "notices" | "student-login" | "admin-login" | null;
 
 export function PortalModals({
   activeModal,
@@ -13,11 +13,33 @@ export function PortalModals({
 }) {
   const [rollNo, setRollNo] = useState("");
   const [certId, setCertId] = useState("");
+  const [password, setPassword] = useState("");
+  const [adminUser, setAdminUser] = useState("");
+  const [adminPass, setAdminPass] = useState("");
   const [searchResult, setSearchResult] = useState<any | null>(null);
   const [certResult, setCertResult] = useState<any | null>(null);
+  const [loginSuccess, setLoginSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   if (!activeModal) return null;
+
+  const handleStudentLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setLoginSuccess(`Welcome back, Student (${rollNo.toUpperCase() || "JAM-2026-084"})! Access granted to your Student Portal dashboard.`);
+    }, 800);
+  };
+
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setLoginSuccess(`Access Granted! Welcome to Jamiya Academy Admin Portal (Directress Panel).`);
+    }, 800);
+  };
 
   // Mock Result Search
   const handleResultSearch = (e: React.FormEvent) => {
@@ -95,13 +117,15 @@ export function PortalModals({
               {activeModal === "results" && "Student Results Portal"}
               {activeModal === "certificates" && "Certificate Verification Portal"}
               {activeModal === "notices" && "Academy Notice Board"}
+              {activeModal === "student-login" && "Student Portal Login"}
+              {activeModal === "admin-login" && "Academy Admin Portal Login"}
             </h3>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="text-white/70 hover:text-white text-xl font-bold p-1 rounded-full hover:bg-white/10 transition-colors"
+            className="text-white/70 hover:text-white text-xl font-bold p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -109,7 +133,132 @@ export function PortalModals({
 
         {/* Modal Body */}
         <div className="p-6 sm:p-8 overflow-y-auto space-y-6 bg-[#FDFBF7]">
-          
+
+          {/* STUDENT LOGIN MODAL */}
+          {activeModal === "student-login" && (
+            <div className="space-y-5">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Log in to access your live & recorded class links, PDF study notes, assignment submissions, and progress reports.
+              </p>
+
+              {loginSuccess ? (
+                <div className="bg-card border-2 border-accent p-5 rounded-xs space-y-3 animate-in fade-in text-center">
+                  <span className="text-2xl">🎓</span>
+                  <h4 className="font-serif text-lg font-bold text-primary">Student Authentication Successful</h4>
+                  <p className="text-xs text-muted-foreground">{loginSuccess}</p>
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-2 rounded-full bg-primary text-primary-foreground px-6 py-2 text-xs font-bold uppercase tracking-widest"
+                  >
+                    Open Student WhatsApp Dashboard →
+                  </a>
+                </div>
+              ) : (
+                <form onSubmit={handleStudentLogin} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-[0.2em] text-primary mb-1.5">
+                      Roll No / Student ID
+                    </label>
+                    <input
+                      type="text"
+                      value={rollNo}
+                      onChange={(e) => setRollNo(e.target.value)}
+                      placeholder="e.g. JAM-2026-084"
+                      className="w-full rounded-full border border-border bg-card px-5 py-3 text-xs text-primary placeholder:text-muted-foreground/60 focus:border-accent focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-[0.2em] text-primary mb-1.5">
+                      Access Passcode / Password
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full rounded-full border border-border bg-card px-5 py-3 text-xs text-primary focus:border-accent focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-full bg-primary py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground hover:bg-primary/90 transition-all cursor-pointer shadow-xs"
+                  >
+                    {loading ? "Authenticating..." : "LOGIN TO STUDENT PORTAL →"}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {/* ADMIN LOGIN MODAL */}
+          {activeModal === "admin-login" && (
+            <div className="space-y-5">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Restricted access for Academy Directress, Faculty Scholars, and Administrative Staff.
+              </p>
+
+              {loginSuccess ? (
+                <div className="bg-card border-2 border-accent p-5 rounded-xs space-y-3 animate-in fade-in text-center">
+                  <span className="text-2xl">🔐</span>
+                  <h4 className="font-serif text-lg font-bold text-primary">Admin Access Granted</h4>
+                  <p className="text-xs text-muted-foreground">{loginSuccess}</p>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="inline-block mt-2 rounded-full bg-primary text-primary-foreground px-6 py-2 text-xs font-bold uppercase tracking-widest cursor-pointer"
+                  >
+                    Enter Management Dashboard
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleAdminLogin} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-[0.2em] text-primary mb-1.5">
+                      Admin Username / Staff ID
+                    </label>
+                    <input
+                      type="text"
+                      value={adminUser}
+                      onChange={(e) => setAdminUser(e.target.value)}
+                      placeholder="e.g. directress_fatima"
+                      className="w-full rounded-full border border-border bg-card px-5 py-3 text-xs text-primary placeholder:text-muted-foreground/60 focus:border-accent focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-[0.2em] text-primary mb-1.5">
+                      Security Secret Key
+                    </label>
+                    <input
+                      type="password"
+                      value={adminPass}
+                      onChange={(e) => setAdminPass(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full rounded-full border border-border bg-card px-5 py-3 text-xs text-primary focus:border-accent focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-full bg-[#1B3B2B] py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-[#1B3B2B]/90 transition-all cursor-pointer shadow-xs"
+                  >
+                    {loading ? "Verifying Secret Key..." : "LOGIN TO ADMIN PORTAL →"}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
           {/* 1. RESULTS MODAL */}
           {activeModal === "results" && (
             <div className="space-y-6">

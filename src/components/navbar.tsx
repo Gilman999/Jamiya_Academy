@@ -7,7 +7,8 @@ const WHATSAPP_URL = "https://wa.me/919368324180?text=Assalamu%20Alaikum%2C%20I%
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState<"results" | "certificates" | "notices" | null>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<"results" | "certificates" | "notices" | "student-login" | "admin-login" | null>(null);
 
   const links = [
     { href: "/", label: "HOME" },
@@ -117,11 +118,65 @@ export function Navbar() {
             ))}
           </nav>
 
-          {/* CTA Button & Mobile Toggle */}
-          <div className="flex shrink-0 items-center gap-3">
+          {/* CTA Buttons (LOGIN & ENROLL) & Mobile Toggle */}
+          <div className="flex shrink-0 items-center gap-2.5">
+            {/* LOGIN CTA Dropdown */}
+            <div
+              className="relative group py-1"
+              onMouseEnter={() => setLoginOpen(true)}
+              onMouseLeave={() => setLoginOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLoginOpen((v) => !v);
+                }}
+                className="rounded-full border-2 border-primary bg-transparent px-3.5 py-1.5 text-[10px] sm:px-5 sm:py-2 sm:text-xs font-semibold uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary hover:text-primary-foreground flex items-center gap-1 cursor-pointer"
+              >
+                <span>LOGIN</span>
+                <span className={`text-[10px] opacity-70 transition-transform ${loginOpen ? "rotate-180" : "group-hover:rotate-180"}`}>▾</span>
+              </button>
+
+              {/* Login Dropdown Options */}
+              <div className={`absolute top-full right-0 mt-1 w-48 bg-card border border-border/80 shadow-xl rounded-xs p-1.5 transition-all duration-200 z-50 ${
+                loginOpen
+                  ? "opacity-100 pointer-events-auto translate-y-0"
+                  : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+              }`}>
+                <div className="space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginOpen(false);
+                      setOpen(false);
+                      setActiveModal("student-login");
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
+                  >
+                    <span>🎓 STUDENT LOGIN</span>
+                    <span className="text-accent text-xs">→</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginOpen(false);
+                      setOpen(false);
+                      setActiveModal("admin-login");
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
+                  >
+                    <span>🔐 ADMIN LOGIN</span>
+                    <span className="text-accent text-xs">→</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <Link
               to="/admission"
-              className="rounded-full bg-primary px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-sm sm:px-6 sm:text-xs"
+              className="rounded-full bg-primary px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-sm sm:px-6 sm:text-xs"
             >
               ENROLL
             </Link>
@@ -131,7 +186,7 @@ export function Navbar() {
               aria-label="Toggle menu"
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
-              className="grid h-9 w-9 place-items-center rounded-full border border-border text-primary lg:hidden"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border text-primary lg:hidden cursor-pointer"
             >
               <span className="relative block h-3 w-4">
                 <span className={`absolute left-0 top-0 h-px w-4 bg-current transition-transform ${open ? "translate-y-[6px] rotate-45" : ""}`} />
@@ -146,12 +201,41 @@ export function Navbar() {
         {open && (
           <nav className="border-t border-border/60 bg-background lg:hidden">
             <ul className="mx-auto flex max-w-6xl flex-col px-4 py-2 sm:px-6">
+              {/* Mobile LOGIN Portals */}
+              <li className="border-b border-border/40 py-2">
+                <p className="py-1 text-xs font-bold uppercase tracking-[0.2em] text-accent">
+                  PORTAL LOGIN
+                </p>
+                <div className="pl-3 space-y-2 my-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      setActiveModal("student-login");
+                    }}
+                    className="block w-full text-left py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary hover:text-accent"
+                  >
+                    • 🎓 Student Login
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      setActiveModal("admin-login");
+                    }}
+                    className="block w-full text-left py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary hover:text-accent"
+                  >
+                    • 🔐 Admin Login
+                  </button>
+                </div>
+              </li>
+
               {links.map((l) => (
                 <li key={l.label}>
                   {l.isDropdown ? (
                     <div className="border-b border-border/40 py-2">
                       <p className="py-1 text-xs font-bold uppercase tracking-[0.2em] text-accent">
-                        {l.label} PORTALS
+                        {l.label} SERVICES
                       </p>
                       <div className="pl-3 space-y-1.5 my-1">
                         {dropdownItems.map((item) => (

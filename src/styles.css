@@ -103,18 +103,20 @@
   }
 }
 
-@utility ornament-divider {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: var(--gold);
+@layer utilities {
+  .ornament-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--gold);
 
-  &::before,
-  &::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+    }
   }
 }
 

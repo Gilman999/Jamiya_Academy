@@ -86,7 +86,7 @@ export function PortalModals({
       <div className="bg-card border-2 border-accent max-w-lg w-full rounded-xs shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="bg-[#162E25] text-white p-6 flex items-center justify-between border-b border-accent/40">
+        <div className="bg-[#1B3B2B] text-white p-6 flex items-center justify-between border-b border-accent/40">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent">
               ACADEMY PORTAL
@@ -108,7 +108,7 @@ export function PortalModals({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 bg-[#FBF9F5]">
+        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 bg-[#FDFBF7]">
           
           {/* 1. RESULTS MODAL */}
           {activeModal === "results" && (
@@ -193,7 +193,7 @@ export function PortalModals({
                 <div className="bg-card border-2 border-accent/60 p-5 rounded-xs space-y-3 animate-in fade-in">
                   <div className="flex items-center justify-between border-b border-border/40 pb-2">
                     <span className="font-serif text-sm font-bold text-primary">{certResult.studentName}</span>
-                    <span className="bg-accent text-[#162E25] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="bg-accent text-[#1B3B2B] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                       VERIFIED
                     </span>
                   </div>
@@ -233,7 +233,7 @@ export function PortalModals({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 bg-[#F7F4EE] border-t border-border/60 flex items-center justify-between text-xs">
+        <div className="p-4 bg-[#F5EFE6] border-t border-border/60 flex items-center justify-between text-xs">
           <a
             href={WHATSAPP_URL}
             target="_blank"

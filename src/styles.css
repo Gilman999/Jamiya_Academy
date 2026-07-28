@@ -43,39 +43,40 @@
 :root {
   --radius: 0.25rem;
 
-  /* Warm cream parchment + deep emerald + antique gold */
-  --parchment: oklch(0.965 0.018 85);
-  --ink: oklch(0.22 0.02 150);
+  /* Official Palette Tokens */
+  /* Warm Cream: #FDFBF7 | Deep Forest Emerald Green: #1B3B2B | Muted Gold: #D4AF37 | Charcoal Slate: #1C201D | Soft Ivory Beige: #F5EFE6 */
+  --parchment: #FDFBF7;
+  --ink: #1C201D;
 
-  --background: oklch(0.965 0.018 85);
-  --foreground: oklch(0.22 0.02 150);
+  --background: #FDFBF7;
+  --foreground: #1C201D;
 
-  --card: oklch(0.98 0.012 85);
-  --card-foreground: oklch(0.22 0.02 150);
+  --card: #FDFBF7;
+  --card-foreground: #1C201D;
 
-  --popover: oklch(0.98 0.012 85);
-  --popover-foreground: oklch(0.22 0.02 150);
+  --popover: #FDFBF7;
+  --popover-foreground: #1C201D;
 
-  --primary: oklch(0.32 0.06 160);
-  --primary-foreground: oklch(0.965 0.018 85);
+  --primary: #1B3B2B;
+  --primary-foreground: #FDFBF7;
 
-  --secondary: oklch(0.92 0.02 85);
-  --secondary-foreground: oklch(0.22 0.02 150);
+  --secondary: #F5EFE6;
+  --secondary-foreground: #1C201D;
 
-  --muted: oklch(0.93 0.015 85);
-  --muted-foreground: oklch(0.45 0.02 150);
+  --muted: #F5EFE6;
+  --muted-foreground: #525C56;
 
-  --accent: oklch(0.72 0.11 75);
-  --accent-foreground: oklch(0.22 0.02 150);
+  --accent: #D4AF37;
+  --accent-foreground: #1B3B2B;
 
-  --gold: oklch(0.68 0.11 75);
+  --gold: #D4AF37;
 
-  --destructive: oklch(0.55 0.2 27);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive: #A33B3B;
+  --destructive-foreground: #FDFBF7;
 
-  --border: oklch(0.85 0.02 85);
-  --input: oklch(0.88 0.02 85);
-  --ring: oklch(0.32 0.06 160);
+  --border: #E3D9C9;
+  --input: #E3D9C9;
+  --ring: #1B3B2B;
 }
 
 @layer base {

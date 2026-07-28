@@ -69,31 +69,36 @@ export function Navbar() {
                 >
                   <button
                     type="button"
-                    onClick={() => setFeaturesOpen((v) => !v)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFeaturesOpen((v) => !v);
+                    }}
                     className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
                   >
                     <span>{l.label}</span>
-                    <span className="text-[10px] opacity-70 group-hover:rotate-180 transition-transform">▾</span>
+                    <span className={`text-[10px] opacity-70 transition-transform ${featuresOpen ? "rotate-180" : "group-hover:rotate-180"}`}>▾</span>
                   </button>
 
                   {/* Dropdown Menu on Hover AND Click */}
-                  {(featuresOpen || true) && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-48 bg-card border border-border/80 shadow-xl rounded-xs p-1.5 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
-                      <div className="space-y-0.5">
-                        {dropdownItems.map((item) => (
-                          <button
-                            key={item.label}
-                            type="button"
-                            onClick={() => handleDropdownClick(item)}
-                            className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
-                          >
-                            <span>{item.label}</span>
-                            <span className="text-accent text-xs">→</span>
-                          </button>
-                        ))}
-                      </div>
+                  <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 w-52 bg-card border border-border/80 shadow-xl rounded-xs p-1.5 transition-all duration-200 z-50 ${
+                    featuresOpen
+                      ? "opacity-100 pointer-events-auto translate-y-0"
+                      : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+                  }`}>
+                    <div className="space-y-0.5">
+                      {dropdownItems.map((item) => (
+                        <button
+                          key={item.label}
+                          type="button"
+                          onClick={() => handleDropdownClick(item)}
+                          className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
+                        >
+                          <span>{item.label}</span>
+                          <span className="text-accent text-xs">→</span>
+                        </button>
+                      ))}
                     </div>
-                  )}
+                  </div>
                 </div>
               ) : l.href.startsWith("/") && !l.href.includes("#") ? (
                 <Link

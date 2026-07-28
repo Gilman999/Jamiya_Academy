@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { PortalModals } from "@/components/portal-modals";
 
@@ -9,6 +9,16 @@ export function Navbar() {
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<"results" | "certificates" | "notices" | "student-login" | "admin-login" | null>(null);
+
+  // Close open dropdowns when clicking anywhere outside
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setFeaturesOpen(false);
+      setLoginOpen(false);
+    };
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, []);
 
   const links = [
     { href: "/", label: "HOME" },
@@ -28,6 +38,7 @@ export function Navbar() {
 
   const handleDropdownClick = (item: typeof dropdownItems[0]) => {
     setFeaturesOpen(false);
+    setLoginOpen(false);
     setOpen(false);
     if (item.action === "admission") {
       window.location.href = "/admission";
@@ -64,42 +75,40 @@ export function Navbar() {
               l.isDropdown ? (
                 <div
                   key={l.label}
-                  className="relative group py-2"
-                  onMouseEnter={() => setFeaturesOpen(true)}
-                  onMouseLeave={() => setFeaturesOpen(false)}
+                  className="relative py-2"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
+                      setLoginOpen(false);
                       setFeaturesOpen((v) => !v);
                     }}
-                    className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
+                    className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer group"
                   >
                     <span>{l.label}</span>
-                    <span className={`text-[10px] opacity-70 transition-transform ${featuresOpen ? "rotate-180" : "group-hover:rotate-180"}`}>▾</span>
+                    <span className={`text-[10px] opacity-70 transition-transform duration-200 ${featuresOpen ? "rotate-180 text-accent font-bold" : "group-hover:rotate-180"}`}>▾</span>
                   </button>
 
-                  {/* Dropdown Menu on Hover AND Click */}
-                  <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 w-52 bg-card border border-border/80 shadow-xl rounded-xs p-1.5 transition-all duration-200 z-50 ${
-                    featuresOpen
-                      ? "opacity-100 pointer-events-auto translate-y-0"
-                      : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
-                  }`}>
-                    <div className="space-y-0.5">
-                      {dropdownItems.map((item) => (
-                        <button
-                          key={item.label}
-                          type="button"
-                          onClick={() => handleDropdownClick(item)}
-                          className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
-                        >
-                          <span>{item.label}</span>
-                          <span className="text-accent text-xs">→</span>
-                        </button>
-                      ))}
+                  {/* Dropdown Menu — Clickable Toggle (Stays open until clicked again) */}
+                  {featuresOpen && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-52 bg-card border-2 border-accent/80 shadow-2xl rounded-xs p-1.5 transition-all duration-200 z-50 animate-in fade-in zoom-in-95">
+                      <div className="space-y-0.5">
+                        {dropdownItems.map((item) => (
+                          <button
+                            key={item.label}
+                            type="button"
+                            onClick={() => handleDropdownClick(item)}
+                            className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.2em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
+                          >
+                            <span>{item.label}</span>
+                            <span className="text-accent text-xs">→</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ) : l.href.startsWith("/") && !l.href.includes("#") ? (
                 <Link
@@ -120,58 +129,60 @@ export function Navbar() {
 
           {/* CTA Buttons (LOGIN & ENROLL) & Mobile Toggle */}
           <div className="flex shrink-0 items-center gap-2.5">
-            {/* LOGIN CTA Dropdown */}
+            {/* LOGIN CTA Dropdown — Clickable Toggle */}
             <div
-              className="relative group py-1"
-              onMouseEnter={() => setLoginOpen(true)}
-              onMouseLeave={() => setLoginOpen(false)}
+              className="relative py-1"
+              onClick={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
+                  setFeaturesOpen(false);
                   setLoginOpen((v) => !v);
                 }}
-                className="rounded-full border-2 border-primary bg-transparent px-3.5 py-1.5 text-[10px] sm:px-5 sm:py-2 sm:text-xs font-semibold uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary hover:text-primary-foreground flex items-center gap-1 cursor-pointer"
+                className={`rounded-full border-2 border-primary px-3.5 py-1.5 text-[10px] sm:px-5 sm:py-2 sm:text-xs font-semibold uppercase tracking-[0.2em] transition-all flex items-center gap-1 cursor-pointer ${
+                  loginOpen
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "bg-transparent text-primary hover:bg-primary/10"
+                }`}
               >
                 <span>LOGIN</span>
-                <span className={`text-[10px] opacity-70 transition-transform ${loginOpen ? "rotate-180" : "group-hover:rotate-180"}`}>▾</span>
+                <span className={`text-[10px] opacity-70 transition-transform duration-200 ${loginOpen ? "rotate-180 text-accent font-bold" : ""}`}>▾</span>
               </button>
 
-              {/* Login Dropdown Options */}
-              <div className={`absolute top-full right-0 mt-1 w-48 bg-card border border-border/80 shadow-xl rounded-xs p-1.5 transition-all duration-200 z-50 ${
-                loginOpen
-                  ? "opacity-100 pointer-events-auto translate-y-0"
-                  : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
-              }`}>
-                <div className="space-y-0.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginOpen(false);
-                      setOpen(false);
-                      setActiveModal("student-login");
-                    }}
-                    className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
-                  >
-                    <span>🎓 STUDENT LOGIN</span>
-                    <span className="text-accent text-xs">→</span>
-                  </button>
+              {/* Login Dropdown Options — Stays open until clicked again */}
+              {loginOpen && (
+                <div className="absolute top-full right-0 mt-1 w-52 bg-card border-2 border-accent/80 shadow-2xl rounded-xs p-1.5 transition-all duration-200 z-50 animate-in fade-in zoom-in-95">
+                  <div className="space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoginOpen(false);
+                        setOpen(false);
+                        setActiveModal("student-login");
+                      }}
+                      className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
+                    >
+                      <span>🎓 STUDENT LOGIN</span>
+                      <span className="text-accent text-xs">→</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginOpen(false);
-                      setOpen(false);
-                      setActiveModal("admin-login");
-                    }}
-                    className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
-                  >
-                    <span>🔐 ADMIN LOGIN</span>
-                    <span className="text-accent text-xs">→</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoginOpen(false);
+                        setOpen(false);
+                        setActiveModal("admin-login");
+                      }}
+                      className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
+                    >
+                      <span>🔐 ADMIN LOGIN</span>
+                      <span className="text-accent text-xs">→</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <Link

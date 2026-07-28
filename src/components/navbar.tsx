@@ -14,11 +14,12 @@ export function Navbar() {
     { href: "/about", label: "ABOUT US" },
     { href: "/library", label: "LIBRARY" },
     { href: "/#why-choose-us", label: "FEATURES", isDropdown: true },
+    { href: "/gallery", label: "GALLERY" },
     { href: "/#contact", label: "CONTACT" },
   ];
 
   const dropdownItems = [
-    { label: "ADMISSION", action: "admission", href: WHATSAPP_URL },
+    { label: "ADMISSION FORM", action: "admission", href: "/admission" },
     { label: "RESULTS", action: "results" },
     { label: "CERTIFICATES", action: "certificates" },
     { label: "NOTICE BOARD", action: "notices" },
@@ -28,7 +29,7 @@ export function Navbar() {
     setFeaturesOpen(false);
     setOpen(false);
     if (item.action === "admission") {
-      window.open(WHATSAPP_URL, "_blank");
+      window.location.href = "/admission";
     } else {
       setActiveModal(item.action as any);
     }
@@ -113,14 +114,12 @@ export function Navbar() {
 
           {/* CTA Button & Mobile Toggle */}
           <div className="flex shrink-0 items-center gap-3">
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/admission"
               className="rounded-full bg-primary px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-sm sm:px-6 sm:text-xs"
             >
               ENROLL
-            </a>
+            </Link>
 
             <button
               type="button"

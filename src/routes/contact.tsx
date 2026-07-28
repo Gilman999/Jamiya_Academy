@@ -345,7 +345,7 @@ export function ContactPage() {
 
 function Footer() {
   return (
-    <footer className="border-t border-border bg-primary text-primary-foreground">
+    <footer className="relative z-20 border-t border-border bg-[#162E25] text-primary-foreground">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
         <div className="grid gap-10 md:grid-cols-3">
           <div>

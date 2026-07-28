@@ -336,9 +336,9 @@ function ClassesModeSection() {
         {/* Smooth Crossfading Content Grids */}
         <div className="relative min-h-[580px] pt-2 md:pt-4">
           
-          {/* ONLINE CARDS GRID — Swipeable Horizontally on Mobile */}
+          {/* ONLINE CARDS GRID — Swipeable & Centered Horizontally on Mobile */}
           <div
-            className={`flex md:grid md:grid-cols-3 gap-5 md:gap-6 w-full overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pt-5 pb-4 md:pt-4 md:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 ${
+            className={`flex md:grid md:grid-cols-3 gap-5 md:gap-6 w-full overflow-x-auto md:overflow-visible snap-x snap-mandatory scrollbar-none pt-5 pb-4 md:pt-4 md:pb-0 px-[7.5vw] md:px-0 ${
               mode === "online"
                 ? "opacity-100 translate-y-0 relative z-10 transition-all duration-400 ease-out"
                 : "opacity-0 pointer-events-none absolute inset-x-0 top-4 translate-y-3 scale-[0.98] transition-all duration-300 ease-in"
@@ -479,9 +479,9 @@ function ClassesModeSection() {
             </div>
           </div>
 
-          {/* OFFLINE CARDS GRID — Swipeable Horizontally on Mobile */}
+          {/* OFFLINE CARDS GRID — Swipeable & Centered Horizontally on Mobile */}
           <div
-            className={`flex md:grid md:grid-cols-3 gap-5 md:gap-6 w-full overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pt-5 pb-4 md:pt-4 md:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 ${
+            className={`flex md:grid md:grid-cols-3 gap-5 md:gap-6 w-full overflow-x-auto md:overflow-visible snap-x snap-mandatory scrollbar-none pt-5 pb-4 md:pt-4 md:pb-0 px-[7.5vw] md:px-0 ${
               mode === "offline"
                 ? "opacity-100 translate-y-0 relative z-10 transition-all duration-400 ease-out"
                 : "opacity-0 pointer-events-none absolute inset-x-0 top-4 translate-y-3 scale-[0.98] transition-all duration-300 ease-in"
@@ -1029,7 +1029,7 @@ function Contact() {
 
 function Footer() {
   return (
-    <footer className="border-t border-border bg-primary text-primary-foreground">
+    <footer className="relative z-20 border-t border-border bg-[#162E25] text-primary-foreground">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
         <div className="grid gap-10 md:grid-cols-3">
           <div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { signInStudent } from "@/lib/supabase";
 
 const WHATSAPP_URL = "https://wa.me/919368324180?text=Assalamu%20Alaikum%2C%20I%20want%20to%20verify%20my%20result%20or%20certificate";
 
@@ -19,17 +20,28 @@ export function PortalModals({
   const [searchResult, setSearchResult] = useState<any | null>(null);
   const [certResult, setCertResult] = useState<any | null>(null);
   const [loginSuccess, setLoginSuccess] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   if (!activeModal) return null;
 
-  const handleStudentLogin = (e: React.FormEvent) => {
+  const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setLoginSuccess(`Welcome back, Student (${rollNo.toUpperCase() || "JAM-2026-084"})! Access granted to your Student Portal dashboard.`);
-    }, 800);
+    setAuthError(null);
+
+    const { user, error } = await signInStudent(rollNo, password);
+
+    setLoading(false);
+    if (error) {
+      setAuthError(error);
+    } else if (user) {
+      setLoginSuccess(`Welcome back, ${user.name}! Authenticated via Supabase. Opening your Student Dashboard...`);
+      setTimeout(() => {
+        onClose();
+        window.location.href = "/dashboard";
+      }, 1000);
+    }
   };
 
   const handleAdminLogin = (e: React.FormEvent) => {
@@ -146,28 +158,35 @@ export function PortalModals({
                   <span className="text-2xl">🎓</span>
                   <h4 className="font-serif text-lg font-bold text-primary">Student Authentication Successful</h4>
                   <p className="text-xs text-muted-foreground">{loginSuccess}</p>
-                  <a
-                    href={WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-2 rounded-full bg-primary text-primary-foreground px-6 py-2 text-xs font-bold uppercase tracking-widest"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      window.location.href = "/dashboard";
+                    }}
+                    className="inline-block mt-2 rounded-full bg-primary text-primary-foreground px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-primary/90 cursor-pointer shadow-md"
                   >
-                    Open Student WhatsApp Dashboard →
-                  </a>
+                    Open Student Dashboard Now →
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleStudentLogin} className="space-y-4">
+                  {authError && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xs font-medium">
+                      ⚠️ {authError}
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-[0.2em] text-primary mb-1.5">
-                      Roll No / Student ID
+                      Roll No / Student Email
                     </label>
                     <input
                       type="text"
                       value={rollNo}
                       onChange={(e) => setRollNo(e.target.value)}
-                      placeholder="e.g. JAM-2026-084"
+                      placeholder="e.g. JAM-2026-084 or student@jamiya.edu"
                       className="w-full rounded-full border border-border bg-card px-5 py-3 text-xs text-primary placeholder:text-muted-foreground/60 focus:border-accent focus:outline-none"
-                      required
                     />
                   </div>
 
@@ -181,7 +200,6 @@ export function PortalModals({
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       className="w-full rounded-full border border-border bg-card px-5 py-3 text-xs text-primary focus:border-accent focus:outline-none"
-                      required
                     />
                   </div>
 
@@ -190,8 +208,22 @@ export function PortalModals({
                     disabled={loading}
                     className="w-full rounded-full bg-primary py-3 text-xs font-bold uppercase tracking-widest text-primary-foreground hover:bg-primary/90 transition-all cursor-pointer shadow-xs"
                   >
-                    {loading ? "Authenticating..." : "LOGIN TO STUDENT PORTAL →"}
+                    {loading ? "Authenticating via Supabase..." : "LOGIN WITH SUPABASE →"}
                   </button>
+
+                  <div className="pt-2 text-center border-t border-border/40">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        setRollNo("JAM-2026-084");
+                        setPassword("student123");
+                        handleStudentLogin(e);
+                      }}
+                      className="text-[11px] font-bold text-accent uppercase tracking-wider hover:underline cursor-pointer"
+                    >
+                      ✨ Demo Student One-Click Login
+                    </button>
+                  </div>
                 </form>
               )}
             </div>

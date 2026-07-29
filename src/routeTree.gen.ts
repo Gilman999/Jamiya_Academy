@@ -11,10 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminDashboardRouteImport } from './routes/admin-dashboard'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdmissionRouteImport } from './routes/admission'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as LibraryRouteImport } from './routes/library'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as StudentLoginRouteImport } from './routes/student-login'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,6 +30,16 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin-dashboard',
+  path: '/admin-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdmissionRoute = AdmissionRouteImport.update({
@@ -36,6 +52,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -46,55 +67,123 @@ const LibraryRoute = LibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentLoginRoute = StudentLoginRouteImport.update({
+  id: '/student-login',
+  path: '/student-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin-dashboard': typeof AdminDashboardRoute
+  '/admin-login': typeof AdminLoginRoute
   '/admission': typeof AdmissionRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/gallery': typeof GalleryRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/student-login': typeof StudentLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin-dashboard': typeof AdminDashboardRoute
+  '/admin-login': typeof AdminLoginRoute
   '/admission': typeof AdmissionRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/gallery': typeof GalleryRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/student-login': typeof StudentLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin-dashboard': typeof AdminDashboardRoute
+  '/admin-login': typeof AdminLoginRoute
   '/admission': typeof AdmissionRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/gallery': typeof GalleryRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/student-login': typeof StudentLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/admission' | '/contact' | '/gallery' | '/library'
+    | '/'
+    | '/about'
+    | '/admin-dashboard'
+    | '/admin-login'
+    | '/admission'
+    | '/contact'
+    | '/dashboard'
+    | '/gallery'
+    | '/library'
+    | '/login'
+    | '/register'
+    | '/student-login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admission' | '/contact' | '/gallery' | '/library'
+  to:
+    | '/'
+    | '/about'
+    | '/admin-dashboard'
+    | '/admin-login'
+    | '/admission'
+    | '/contact'
+    | '/dashboard'
+    | '/gallery'
+    | '/library'
+    | '/login'
+    | '/register'
+    | '/student-login'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin-dashboard'
+    | '/admin-login'
     | '/admission'
     | '/contact'
+    | '/dashboard'
     | '/gallery'
     | '/library'
+    | '/login'
+    | '/register'
+    | '/student-login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AdmissionRoute: typeof AdmissionRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
   GalleryRoute: typeof GalleryRoute
   LibraryRoute: typeof LibraryRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+  StudentLoginRoute: typeof StudentLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -113,6 +202,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-dashboard': {
+      id: '/admin-dashboard'
+      path: '/admin-dashboard'
+      fullPath: '/admin-dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admission': {
       id: '/admission'
       path: '/admission'
@@ -125,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -141,16 +251,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student-login': {
+      id: '/student-login'
+      path: '/student-login'
+      fullPath: '/student-login'
+      preLoaderRoute: typeof StudentLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AdmissionRoute: AdmissionRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
   GalleryRoute: GalleryRoute,
   LibraryRoute: LibraryRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
+  StudentLoginRoute: StudentLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

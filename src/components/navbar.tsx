@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { PortalModals } from "@/components/portal-modals";
+import { getCurrentStudent, StudentProfile } from "@/lib/supabase";
 
 const WHATSAPP_URL = "https://wa.me/919368324180?text=Assalamu%20Alaikum%2C%20I%20want%20to%20take%20admission%20in%20Jamiya%20Kaneez%20E%20Sayyeda%20Fatima%20Academy";
 
@@ -9,6 +10,17 @@ export function Navbar() {
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<"results" | "certificates" | "notices" | "student-login" | "admin-login" | null>(null);
+  const [studentSession, setStudentSession] = useState<StudentProfile | null>(null);
+
+  useEffect(() => {
+    async function checkSession() {
+      const student = await getCurrentStudent();
+      if (student) {
+        setStudentSession(student);
+      }
+    }
+    checkSession();
+  }, []);
 
   // Close open dropdowns when clicking anywhere outside
   useEffect(() => {
@@ -153,33 +165,45 @@ export function Navbar() {
 
               {/* Login Dropdown Options — Stays open until clicked again */}
               {loginOpen && (
-                <div className="absolute top-full right-0 mt-1 w-52 bg-card border-2 border-accent/80 shadow-2xl rounded-xs p-1.5 transition-all duration-200 z-50 animate-in fade-in zoom-in-95">
+                <div className="absolute top-full right-0 mt-1 w-56 bg-card border-2 border-accent/80 shadow-2xl rounded-xs p-1.5 transition-all duration-200 z-50 animate-in fade-in zoom-in-95">
                   <div className="space-y-0.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setLoginOpen(false);
-                        setOpen(false);
-                        setActiveModal("student-login");
-                      }}
+                    {studentSession && (
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setLoginOpen(false)}
+                        className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-accent bg-accent/10 hover:bg-accent/20 transition-colors flex items-center justify-between cursor-pointer border border-accent/40 mb-1"
+                      >
+                        <span>✨ MY DASHBOARD</span>
+                        <span className="text-accent text-xs">→</span>
+                      </Link>
+                    )}
+
+                    <Link
+                      to="/student-login"
+                      onClick={() => setLoginOpen(false)}
                       className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
                     >
                       <span>🎓 STUDENT LOGIN</span>
                       <span className="text-accent text-xs">→</span>
-                    </button>
+                    </Link>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setLoginOpen(false);
-                        setOpen(false);
-                        setActiveModal("admin-login");
-                      }}
+                    <Link
+                      to="/admin-login"
+                      onClick={() => setLoginOpen(false)}
                       className="w-full text-left px-3.5 py-2.5 rounded-xs text-[11px] font-bold uppercase tracking-[0.18em] text-primary hover:bg-accent/20 hover:text-accent transition-colors flex items-center justify-between cursor-pointer"
                     >
                       <span>🔐 ADMIN LOGIN</span>
                       <span className="text-accent text-xs">→</span>
-                    </button>
+                    </Link>
+
+                    <Link
+                      to="/admin-dashboard"
+                      onClick={() => setLoginOpen(false)}
+                      className="w-full text-left px-3.5 py-2 rounded-xs text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground hover:text-primary transition-colors flex items-center justify-between cursor-pointer border-t border-border/40 mt-1 pt-1.5"
+                    >
+                      <span>🛠️ ADMIN DASHBOARD</span>
+                      <span className="text-xs">→</span>
+                    </Link>
                   </div>
                 </div>
               )}

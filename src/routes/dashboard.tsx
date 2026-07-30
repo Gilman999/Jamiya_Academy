@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-[#1B3B2B]";
+import { createFileRoute as createRoute } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   BookOpen,
@@ -37,13 +38,14 @@ import {
   MicOff,
   Camera,
   Hand,
-  Volume2,
   RotateCcw,
-  CheckSquare
+  SlidersHorizontal,
+  Calendar as CalendarIcon,
+  Play
 } from "lucide-react";
 import { getCurrentStudent, signOutStudent, StudentProfile, DEMO_STUDENT } from "@/lib/supabase";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Student Portal Dashboard — Jamiya Kaneez E Sayyeda Fatima Lilbanat ﷺ" },
@@ -73,7 +75,7 @@ export function StudentDashboardPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Live Class Timer State (02:45:10)
+  // Live Class Countdown State (02:45:10)
   const [timer, setTimer] = useState({ hours: 2, minutes: 45, seconds: 10 });
 
   useEffect(() => {
@@ -87,6 +89,11 @@ export function StudentDashboardPage() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Recorded Classes State
+  const [activeChapter, setActiveChapter] = useState(1);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [recordedPage, setRecordedPage] = useState(1);
 
   // Digital Library State
   const [libraryCategory, setLibraryCategory] = useState<string>("All Files");
@@ -105,7 +112,7 @@ export function StudentDashboardPage() {
   // Fee State
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
-  // Profile Edit State
+  // Profile Edit State (NO AVATAR PHOTO AS REQUESTED)
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingGuardian, setIsEditingGuardian] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -120,16 +127,10 @@ export function StudentDashboardPage() {
     emailNotifications: true,
   });
 
-  // Online Quiz State
+  // Quiz State
   const [activeQuizModal, setActiveQuizModal] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-
-  // Certificates Filter State
-  const [certFilter, setCertFilter] = useState<"All" | "Completed">("Completed");
-
-  // Live Class Reminders State
-  const [remindersSet, setRemindersSet] = useState<Record<string, boolean>>({ "rem-1": true });
 
   // Notifications Modal
   const [notifOpen, setNotifOpen] = useState(false);
@@ -181,7 +182,7 @@ export function StudentDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#1C201D] flex overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#1C201D] flex overflow-hidden font-sans selection:bg-[#D4AF37]/30 selection:text-[#1B3B2B]">
       
       {/* SIDEBAR NAVIGATION (Desktop) */}
       <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-screen w-[270px] bg-[#1B3B2B] text-white shadow-2xl z-30 border-r border-[#D4AF37]/20">
@@ -255,7 +256,7 @@ export function StudentDashboardPage() {
       {/* MOBILE DRAWER NAV */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs lg:hidden">
-          <div className="w-[270px] h-full bg-[#1B3B2B] text-white flex flex-col p-4 shadow-2xl">
+          <div className="w-[270px] h-full bg-[#1B3B2B] text-white flex flex-col p-4 shadow-2xl animate-in slide-in-from-left">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-2">
                 <img src="/jamiya-logo.png" alt="Logo" className="w-8 h-8 rounded-full bg-white p-0.5" />
@@ -323,7 +324,7 @@ export function StudentDashboardPage() {
 
             {/* Page Title or Greeting */}
             <div>
-              {activeTab === "overview" || activeTab === "fee" || activeTab === "report" || activeTab === "profile" || activeTab === "live-classes" ? (
+              {activeTab === "overview" || activeTab === "fee" || activeTab === "report" || activeTab === "profile" || activeTab === "live-classes" || activeTab === "recorded-classes" ? (
                 <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#1B3B2B]">
                   Welcome back, Student
                 </h2>
@@ -337,11 +338,11 @@ export function StudentDashboardPage() {
 
           <div className="flex items-center gap-3">
             {/* Top Search Input */}
-            <div className="hidden sm:flex items-center gap-2 bg-[#F5EFE6] border border-[#1B3B2B]/15 rounded-full px-4 py-2 text-xs w-64 focus-within:ring-2 focus-within:ring-[#1B3B2B]/20">
+            <div className="hidden sm:flex items-center gap-2 bg-[#F5EFE6] border border-[#1B3B2B]/15 rounded-full px-4 py-2 text-xs w-48 md:w-64 focus-within:ring-2 focus-within:ring-[#1B3B2B]/20">
               <Search className="w-4 h-4 text-muted-foreground shrink-0" />
               <input
                 type="text"
-                placeholder={activeTab === "library" ? "Search digital library..." : "Search courses, library..."}
+                placeholder={activeTab === "library" ? "Search digital library..." : "Search..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-transparent focus:outline-none w-full text-xs text-[#1B3B2B]"
@@ -390,26 +391,22 @@ export function StudentDashboardPage() {
               <Video className="w-4 h-4" />
             </button>
 
-            {/* User Profile Avatar Icon */}
+            {/* User Profile Icon */}
             <button
               type="button"
               onClick={() => setActiveTab("profile")}
-              className="p-0.5 rounded-full border-2 border-[#D4AF37] hover:opacity-90 transition-opacity cursor-pointer"
+              className="p-2 rounded-full bg-[#F5EFE6] hover:bg-[#1B3B2B]/10 text-[#1B3B2B] transition-colors cursor-pointer"
               title="My Profile"
             >
-              <img
-                src={activeStudent.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80"}
-                alt={activeStudent.name}
-                className="w-7 h-7 rounded-full object-cover"
-              />
+              <User className="w-4 h-4" />
             </button>
           </div>
         </header>
 
         {/* DASHBOARD BODY CONTENT BY TAB */}
-        <main className="flex-1 p-4 sm:p-8 space-y-8 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-8 overflow-y-auto">
           
-          {/* TAB 1: OVERVIEW / DASHBOARD HOME (Screenshot 2 Exact replica) */}
+          {/* TAB 1: OVERVIEW / DASHBOARD HOME */}
           {activeTab === "overview" && (
             <div className="space-y-8 animate-in fade-in duration-300">
               
@@ -424,7 +421,6 @@ export function StudentDashboardPage() {
                   </p>
                 </div>
 
-                {/* Right Timer Box */}
                 <div className="p-4 rounded-xl bg-white/10 border border-white/20 text-center space-y-1 shrink-0 w-full md:w-auto">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#FED65B] block">
                     NEXT LIVE CLASS IN
@@ -438,13 +434,11 @@ export function StudentDashboardPage() {
                 </div>
               </div>
 
-              {/* 4 Summary Metric Cards (matching Screenshot 2) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                
-                {/* Card 1: Overall Attendance */}
+              {/* 4 Summary Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 <div 
                   onClick={() => setActiveTab("attendance")}
-                  className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
+                  className="p-5 sm:p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-9 h-9 rounded-xl bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
@@ -455,18 +449,15 @@ export function StudentDashboardPage() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-[11px] font-semibold text-muted-foreground block">
-                      Overall Attendance
-                    </span>
+                    <span className="text-[11px] font-semibold text-muted-foreground block">Overall Attendance</span>
                     <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-1">94%</p>
                   </div>
                   <div className="w-full bg-[#1B3B2B] h-1 rounded-full absolute bottom-0 left-0" />
                 </div>
 
-                {/* Card 2: Enrolled Courses */}
                 <div 
                   onClick={() => setActiveTab("courses")}
-                  className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
+                  className="p-5 sm:p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-9 h-9 rounded-xl bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
@@ -474,18 +465,15 @@ export function StudentDashboardPage() {
                     </div>
                   </div>
                   <div>
-                    <span className="text-[11px] font-semibold text-muted-foreground block">
-                      Enrolled Courses
-                    </span>
+                    <span className="text-[11px] font-semibold text-muted-foreground block">Enrolled Courses</span>
                     <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-1">4</p>
                   </div>
                   <div className="w-full bg-[#1B3B2B] h-1 rounded-full absolute bottom-0 left-0" />
                 </div>
 
-                {/* Card 3: Pending Assignments */}
                 <div 
                   onClick={() => setActiveTab("assignments")}
-                  className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
+                  className="p-5 sm:p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
@@ -496,18 +484,15 @@ export function StudentDashboardPage() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-[11px] font-semibold text-muted-foreground block">
-                      Pending Assignments
-                    </span>
+                    <span className="text-[11px] font-semibold text-muted-foreground block">Pending Assignments</span>
                     <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-1">2</p>
                   </div>
                   <div className="w-full bg-[#D4AF37] h-1 rounded-full absolute bottom-0 left-0" />
                 </div>
 
-                {/* Card 4: Fee Status */}
                 <div 
                   onClick={() => setActiveTab("fee")}
-                  className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
+                  className="p-5 sm:p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs hover:border-[#D4AF37] transition-all cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
@@ -518,45 +503,31 @@ export function StudentDashboardPage() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-[11px] font-semibold text-muted-foreground block">
-                      Fee Status
-                    </span>
+                    <span className="text-[11px] font-semibold text-muted-foreground block">Fee Status</span>
                     <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-1">Paid</p>
                   </div>
                   <div className="w-full bg-[#1B3B2B] h-1 rounded-full absolute bottom-0 left-0" />
                 </div>
-
               </div>
 
-              {/* Bottom Split Layout: Active Courses (Left) + Notice Board (Right) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                {/* Left Active Courses List (8 Cols matching Screenshot 2) */}
-                <div className="lg:col-span-8 p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
+              {/* Active Courses & Notice Board */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                <div className="lg:col-span-8 p-5 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
                   <div className="flex items-center justify-between">
                     <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Active Courses</h3>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("courses")}
-                      className="text-xs font-semibold text-[#1B3B2B] hover:underline flex items-center gap-1"
-                    >
+                    <button type="button" onClick={() => setActiveTab("courses")} className="text-xs font-semibold text-[#1B3B2B] hover:underline flex items-center gap-1">
                       View All →
                     </button>
                   </div>
 
                   <div className="space-y-4">
-                    {/* Course 1 */}
                     <div className="p-5 rounded-2xl bg-white border border-[#1B3B2B]/10 space-y-4">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                           <h4 className="font-serif font-bold text-lg text-[#1B3B2B]">Tajweed & Qirat - Level 2</h4>
                           <p className="text-xs text-muted-foreground mt-0.5">👤 Ustadha Ayesha</p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("courses")}
-                          className="px-5 py-2 rounded-xl bg-[#1B3B2B] text-white text-xs font-semibold hover:bg-[#2B543D] cursor-pointer"
-                        >
+                        <button type="button" onClick={() => setActiveTab("courses")} className="px-5 py-2 rounded-xl bg-[#1B3B2B] text-white text-xs font-semibold hover:bg-[#2B543D] cursor-pointer self-start sm:self-auto">
                           Continue
                         </button>
                       </div>
@@ -571,18 +542,13 @@ export function StudentDashboardPage() {
                       </div>
                     </div>
 
-                    {/* Course 2 */}
                     <div className="p-5 rounded-2xl bg-white border border-[#1B3B2B]/10 space-y-4">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                           <h4 className="font-serif font-bold text-lg text-[#1B3B2B]">Arabic Grammar (Nahw)</h4>
                           <p className="text-xs text-muted-foreground mt-0.5">👤 Ustadha Fatima</p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("courses")}
-                          className="px-5 py-2 rounded-xl bg-[#1B3B2B] text-white text-xs font-semibold hover:bg-[#2B543D] cursor-pointer"
-                        >
+                        <button type="button" onClick={() => setActiveTab("courses")} className="px-5 py-2 rounded-xl bg-[#1B3B2B] text-white text-xs font-semibold hover:bg-[#2B543D] cursor-pointer self-start sm:self-auto">
                           Continue
                         </button>
                       </div>
@@ -599,8 +565,7 @@ export function StudentDashboardPage() {
                   </div>
                 </div>
 
-                {/* Right Notice Board (4 Cols matching Screenshot 2) */}
-                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs relative overflow-hidden">
+                <div className="lg:col-span-4 p-5 sm:p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs relative overflow-hidden">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">📣</span>
                     <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Notice Board</h3>
@@ -610,56 +575,39 @@ export function StudentDashboardPage() {
                     <div className="pt-2 space-y-1">
                       <span className="text-[10px] font-bold text-[#D4AF37] block">Today, 09:00 AM</span>
                       <p className="font-bold text-[#1B3B2B]">Exam Schedule Released</p>
-                      <p className="text-[#1B3B2B]/70 leading-relaxed">
-                        The mid-term examination schedule for all levels has been posted.
-                      </p>
+                      <p className="text-[#1B3B2B]/70 leading-relaxed">The mid-term examination schedule for all levels has been posted.</p>
                     </div>
-
                     <div className="pt-3 space-y-1">
                       <span className="text-[10px] font-bold text-muted-foreground block">Yesterday</span>
                       <p className="font-bold text-[#1B3B2B]">Library Maintenance</p>
-                      <p className="text-[#1B3B2B]/70 leading-relaxed">
-                        The digital library will be down for maintenance from 2 AM to 4 AM.
-                      </p>
+                      <p className="text-[#1B3B2B]/70 leading-relaxed">The digital library will be down for maintenance from 2 AM to 4 AM.</p>
                     </div>
-
                     <div className="pt-3 space-y-1">
                       <span className="text-[10px] font-bold text-muted-foreground block">Oct 12, 2023</span>
                       <p className="font-bold text-[#1B3B2B]">New Guest Lecture</p>
-                      <p className="text-[#1B3B2B]/70 leading-relaxed">
-                        Special session on Seerah scheduled for this Friday.
-                      </p>
+                      <p className="text-[#1B3B2B]/70 leading-relaxed">Special session on Seerah scheduled for this Friday.</p>
                     </div>
                   </div>
                 </div>
-
               </div>
 
             </div>
           )}
 
-          {/* TAB 2: MY PROFILE (Screenshots 3 & 4 Exact replica) */}
+          {/* TAB 2: MY PROFILE (NO PROFILE PICTURE AVATAR AS REQUESTED) */}
           {activeTab === "profile" && (
             <div className="space-y-6 animate-in fade-in duration-300">
               
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
-                {/* Left Column (4 Cols): Student Summary Card & Account Settings */}
+                {/* Left Column: Student Details Card & Account Settings */}
                 <div className="lg:col-span-4 space-y-6">
                   
-                  {/* Profile Card */}
+                  {/* Profile Card (Without Picture as per prompt) */}
                   <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 text-center space-y-4 shadow-xs">
-                    <div className="w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden mx-auto">
-                      <img
-                        src={activeStudent.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80"}
-                        alt={profileData.fullName}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">{profileData.fullName}</h3>
-                      <span className="inline-block px-3 py-1 rounded-full bg-white border border-[#1B3B2B]/15 text-[#1B3B2B] text-[11px] font-semibold">
+                      <span className="inline-block px-3 py-1 rounded-full bg-white border border-[#1B3B2B]/15 text-[#1B3B2B] text-[11px] font-bold">
                         Student ID: JK-2024-089
                       </span>
                       <p className="text-xs text-muted-foreground pt-1">Advanced Islamic Studies</p>
@@ -711,7 +659,7 @@ export function StudentDashboardPage() {
 
                 </div>
 
-                {/* Right Column (8 Cols): Personal Information & Guardian Details */}
+                {/* Right Column: Personal Information & Guardian Details */}
                 <div className="lg:col-span-8 space-y-6">
                   
                   {/* Personal Information */}
@@ -845,594 +793,548 @@ export function StudentDashboardPage() {
             </div>
           )}
 
-          {/* TAB 3: LIVE CLASSES (Screenshot 5 Exact replica) */}
-          {activeTab === "live-classes" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
+          {/* TAB 3: RECORDED CLASSES (Screenshot 3 Exact Replica) */}
+          {activeTab === "recorded-classes" && (
+            <div className="space-y-8 animate-in fade-in duration-300">
               
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Header Title */}
+              <div className="space-y-1">
+                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Recorded Classes</h2>
+              </div>
+
+              {/* Main Featured Video Player & Chapters Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                 
-                {/* Left Hero Card (8 Cols matching Screenshot 5) */}
-                <div className="lg:col-span-8 space-y-6">
-                  
-                  {/* Main Live Banner */}
-                  <div className="rounded-2xl overflow-hidden border border-[#1B3B2B]/20 shadow-lg">
-                    {/* Top Dark Green Banner */}
-                    <div className="bg-[#1B3B2B] text-white p-8 space-y-6">
-                      <span className="inline-block px-3 py-1 rounded-md bg-[#D4AF37]/20 border border-[#D4AF37] text-[#FED65B] text-[10px] font-bold uppercase tracking-widest">
-                        LIVE NOW
-                      </span>
-
-                      <div className="space-y-2">
-                        <h2 className="font-serif font-bold text-3xl sm:text-4xl text-white">
-                          Advanced Fiqh Studies
-                        </h2>
-                        <p className="text-xs sm:text-sm text-white/80">
-                          Shaykh Abdullah Al-Mahmoud
-                        </p>
-                      </div>
+                {/* Left Video Player Container (8 Cols matching Screenshot 3) */}
+                <div className="lg:col-span-8 space-y-4">
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#1B3B2B]/15 bg-black group">
+                    <img
+                      src="https://images.unsplash.com/photo-1577896851231-70ef18881754?w=1000&auto=format&fit=crop&q=80"
+                      alt="Lecture Video Player"
+                      className="w-full h-[280px] sm:h-[380px] object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={() => alert("Playing lecture video: Rules of Noon Sakinah")}
+                        className="w-16 h-16 rounded-full bg-[#D4AF37] text-[#1B3B2B] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform cursor-pointer"
+                      >
+                        <Play className="w-8 h-8 fill-[#1B3B2B] ml-1" />
+                      </button>
                     </div>
+                  </div>
 
-                    {/* Bottom Cream Container */}
-                    <div className="bg-[#F5EFE6] p-6 sm:p-8 space-y-6 text-xs sm:text-sm text-[#1B3B2B]">
-                      <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground font-semibold">
-                        <span className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-[#1B3B2B]" /> 06:00 PM - 07:30 PM (IST)
-                        </span>
-                        <span className="flex items-center gap-2">
-                          <User className="w-4 h-4 text-[#1B3B2B]" /> 142 Students Joined
-                        </span>
+                  {/* Video Meta Info */}
+                  <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="px-3 py-1 rounded-full bg-white border border-[#1B3B2B]/20 text-[#1B3B2B] font-bold text-[10px] uppercase">
+                            TAJWEED
+                          </span>
+                          <span className="text-muted-foreground">Oct 24, 2023 • Shaykh Ali</span>
+                        </div>
+                        <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">
+                          Rules of Noon Sakinah
+                        </h3>
                       </div>
 
-                      <p className="text-[#1B3B2B]/80 leading-relaxed text-xs sm:text-sm">
-                        Today's session focuses on the principles of Islamic jurisprudence regarding contemporary financial transactions, exploring historical contexts and modern applications.
-                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsCompleted(!isCompleted)}
+                        className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                          isCompleted
+                            ? "bg-emerald-700 text-white"
+                            : "bg-[#1B3B2B] text-white hover:bg-[#2B543D]"
+                        }`}
+                      >
+                        <Check className="w-4 h-4" /> {isCompleted ? "Completed" : "Mark as Completed"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
-                        {/* Student Avatars Stack */}
-                        <div className="flex items-center -space-x-2">
-                          <img className="w-8 h-8 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80" alt="Student" />
-                          <img className="w-8 h-8 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80" alt="Student" />
-                          <img className="w-8 h-8 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80" alt="Student" />
-                          <span className="w-8 h-8 rounded-full bg-[#1B3B2B] text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">
-                            +30
+                {/* Right Chapters Sidebar Container (4 Cols matching Screenshot 3) */}
+                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
+                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Chapters</h3>
+
+                  <div className="space-y-2.5 text-xs font-sans">
+                    {[
+                      { id: 0, time: "00:00", title: "Introduction & Review" },
+                      { id: 1, time: "24:15", title: "Izhar (Clear Pronunciation)", desc: "Detailed explanation..." },
+                      { id: 2, time: "32:40", title: "Idgham (Assimilation)" },
+                      { id: 3, time: "45:10", title: "Iqlab & Ikhfa" },
+                      { id: 4, time: "52:00", title: "Q&A Session" },
+                    ].map((chap) => {
+                      const isActive = activeChapter === chap.id;
+                      return (
+                        <div
+                          key={chap.id}
+                          onClick={() => setActiveChapter(chap.id)}
+                          className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                            isActive
+                              ? "bg-white border-[#1B3B2B]/20 shadow-xs"
+                              : "bg-transparent border-transparent hover:bg-white/60"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className={`font-mono text-xs font-bold ${isActive ? "text-[#1B3B2B]" : "text-[#D4AF37]"}`}>
+                              {chap.time}
+                            </span>
+                            <span className={`font-semibold ${isActive ? "text-[#1B3B2B] font-bold" : "text-[#1B3B2B]/80"}`}>
+                              {chap.title}
+                            </span>
+                          </div>
+                          {chap.desc && (
+                            <p className="text-[10px] text-muted-foreground mt-1 pl-12">{chap.desc}</p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Bottom Video Library Section */}
+              <div className="space-y-6 pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1B3B2B]/10 pb-4">
+                  <div>
+                    <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">Video Library</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">Explore past lectures and continue your learning journey.</p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs w-full sm:w-48">
+                      <Search className="w-3.5 h-3.5 text-muted-foreground" />
+                      <input
+                        type="text"
+                        placeholder="Search lectures..."
+                        className="bg-transparent focus:outline-none w-full text-xs"
+                      />
+                    </div>
+                    <button type="button" className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-[#1B3B2B] flex items-center gap-1.5 hover:bg-gray-50">
+                      <SlidersHorizontal className="w-3.5 h-3.5" /> Subject
+                    </button>
+                    <button type="button" className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-[#1B3B2B] flex items-center gap-1.5 hover:bg-gray-50">
+                      <CalendarIcon className="w-3.5 h-3.5" /> Date
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3-Column Video Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[
+                    {
+                      title: "Introduction to Sahih Al-Bukhari",
+                      desc: "An overview of the compilation methodology and historical context.",
+                      tag: "HADITH",
+                      timeAgo: "2 days ago",
+                      duration: "45:20",
+                      instructor: "Ustadh Umar",
+                      progress: 100,
+                      img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                      title: "Advanced Grammar: Nahw Patterns",
+                      desc: "Deep dive into complex sentence structures and grammatical states.",
+                      tag: "ARABIC",
+                      timeAgo: "1 week ago",
+                      duration: "58:15",
+                      instructor: "Shaykh Salih",
+                      progress: 45,
+                      img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                      title: "Principles of Jurisprudence (Usool)",
+                      desc: "Understanding the foundational texts and how rulings are derived.",
+                      tag: "FIQH",
+                      timeAgo: "2 weeks ago",
+                      duration: "1:12:05",
+                      instructor: "Mufti Ahmad",
+                      progress: 0,
+                      img: "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?w=600&auto=format&fit=crop&q=80"
+                    },
+                  ].map((video, i) => (
+                    <div key={i} className="rounded-2xl bg-white border border-[#1B3B2B]/10 overflow-hidden shadow-xs space-y-4 hover:shadow-md transition-all flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="relative h-44 bg-black overflow-hidden group cursor-pointer">
+                          <img src={video.img} alt={video.title} className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-300" />
+                          <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[10px] font-mono text-white">
+                            {video.duration}
                           </span>
                         </div>
 
-                        <a
-                          href="https://zoom.us"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-6 py-3 rounded-xl bg-[#D4AF37] text-[#1B3B2B] font-bold text-xs uppercase tracking-wider hover:bg-[#e9c349] transition-colors flex items-center gap-2 shadow-sm"
-                        >
-                          <Video className="w-4 h-4" /> Join Live Class
-                        </a>
+                        <div className="px-5 space-y-2">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#F5EFE6] font-bold text-[#1B3B2B]">
+                              {video.tag}
+                            </span>
+                            <span className="text-muted-foreground">{video.timeAgo}</span>
+                          </div>
+                          <h4 className="font-serif font-bold text-base text-[#1B3B2B] leading-snug">{video.title}</h4>
+                          <p className="text-xs text-muted-foreground line-clamp-2">{video.desc}</p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Upcoming Schedule */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-[#1B3B2B]/10 pb-3">
-                      <div>
-                        <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">Upcoming Schedule</h3>
-                        <p className="text-xs text-muted-foreground">Your planned live sessions for the week.</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => alert("Opening full live calendar schedule...")}
-                        className="px-4 py-2 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] text-xs font-semibold hover:bg-gray-50"
-                      >
-                        View Full Calendar
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      {[
-                        { id: "rem-1", day: "Tomorrow", time: "10:00 AM", title: "Tafseer ul Quran: Surah Al-Kahf", instructor: "Ustadh Tariq Jameel • Part 3", icon: "📖" },
-                        { id: "rem-2", day: "Wed, Oct 25", time: "02:30 PM", title: "Islamic History: The Umayyad Caliphate", instructor: "Dr. Yasir Qadhi • Module 4", icon: "📜" },
-                        { id: "rem-3", day: "Thu, Oct 26", time: "05:00 PM", title: "Arabic Linguistics (Intermediate)", instructor: "Shaykha Fatima Ali • Session 12", icon: "🔤" },
-                      ].map((item) => {
-                        const isSet = remindersSet[item.id];
-                        return (
-                          <div key={item.id} className="p-5 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div className="flex items-start gap-4">
-                              <div className="text-center bg-white p-2.5 rounded-xl border border-[#1B3B2B]/10 shrink-0 w-24">
-                                <span className="text-[10px] font-bold text-muted-foreground block uppercase">{item.day}</span>
-                                <span className="text-xs font-bold text-[#1B3B2B]">{item.time}</span>
-                              </div>
-                              <div className="space-y-1">
-                                <h4 className="font-serif font-bold text-base text-[#1B3B2B]">{item.title}</h4>
-                                <p className="text-xs text-muted-foreground">{item.instructor}</p>
-                              </div>
+                      <div className="px-5 pb-5 pt-2 space-y-3 border-t border-gray-100">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-[#1B3B2B]/10 flex items-center justify-center font-bold text-[10px] text-[#1B3B2B]">
+                              {video.instructor[0]}
                             </div>
-
-                            <button
-                              type="button"
-                              onClick={() => setRemindersSet((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
-                              className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap ${
-                                isSet
-                                  ? "bg-white text-[#1B3B2B] border-[#1B3B2B]/20"
-                                  : "bg-[#1B3B2B] text-white border-transparent"
-                              }`}
-                            >
-                              {isSet ? "Reminder Set" : "Set Reminder"}
-                            </button>
+                            <span className="font-semibold text-[#1B3B2B] text-xs">{video.instructor}</span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Right Class Etiquette Sidebar (4 Cols matching Screenshot 5) */}
-                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-6 shadow-xs">
-                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B] flex items-center gap-2">
-                    ℹ Class Etiquette
-                  </h3>
-
-                  <div className="space-y-4 divide-y divide-[#1B3B2B]/10 text-xs">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 font-bold text-[#1B3B2B]">
-                        <MicOff className="w-4 h-4 text-[#1B3B2B]" /> Microphone Muted
-                      </div>
-                      <p className="text-[#1B3B2B]/70 leading-relaxed pl-6">
-                        Please keep your microphone muted unless asked to speak by the instructor to avoid background noise.
-                      </p>
-                    </div>
-
-                    <div className="pt-4 space-y-1">
-                      <div className="flex items-center gap-2 font-bold text-[#1B3B2B]">
-                        <Camera className="w-4 h-4 text-[#1B3B2B]" /> Camera Optional
-                      </div>
-                      <p className="text-[#1B3B2B]/70 leading-relaxed pl-6">
-                        Having your camera on is encouraged for interaction, but not mandatory. Ensure a modest background.
-                      </p>
-                    </div>
-
-                    <div className="pt-4 space-y-1">
-                      <div className="flex items-center gap-2 font-bold text-[#1B3B2B]">
-                        <Hand className="w-4 h-4 text-[#1B3B2B]" /> Raise Hand
-                      </div>
-                      <p className="text-[#1B3B2B]/70 leading-relaxed pl-6">
-                        Use the 'Raise Hand' feature in the platform if you have a question during the lecture.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          )}
-
-          {/* TAB 4: CERTIFICATES (Screenshot 1 Exact replica) */}
-          {activeTab === "certificates" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              
-              {/* Main Heading */}
-              <div className="space-y-1">
-                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Certificates</h2>
-              </div>
-
-              {/* Top Summary Cards Grid (2 Cards matching Screenshot 1) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
-                
-                {/* Card 1: Total Earned */}
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex items-center gap-4 shadow-xs">
-                  <div className="w-12 h-12 rounded-full bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
-                    <Award className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                      TOTAL EARNED
-                    </span>
-                    <p className="font-serif font-bold text-3xl text-[#1B3B2B]">2</p>
-                  </div>
-                </div>
-
-                {/* Card 2: In Progress */}
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex items-center gap-4 shadow-xs">
-                  <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center text-[#92400E]">
-                    <Clock className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                      IN PROGRESS
-                    </span>
-                    <p className="font-serif font-bold text-3xl text-[#1B3B2B]">1</p>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Earned Certificates Section */}
-              <div className="space-y-5 pt-2">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">Earned Certificates</h3>
-                    <p className="text-xs text-muted-foreground">Your official records of achievement.</p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setCertFilter("All")}
-                      className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                        certFilter === "All"
-                          ? "bg-[#1B3B2B] text-white"
-                          : "bg-white border border-gray-200 text-[#1B3B2B]"
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCertFilter("Completed")}
-                      className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                        certFilter === "Completed"
-                          ? "bg-[#1B3B2B] text-white"
-                          : "bg-white border border-gray-200 text-[#1B3B2B]"
-                      }`}
-                    >
-                      Completed
-                    </button>
-                  </div>
-                </div>
-
-                {/* 2-Column Certificates Cards Grid (matching Screenshot 1) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
-                  {/* Certificate Card 1 */}
-                  <div className="p-6 rounded-2xl bg-[#F5EFE6] border-2 border-[#D4AF37]/50 flex flex-col sm:flex-row gap-6 shadow-xs hover:shadow-md transition-all">
-                    {/* Left Thumbnail Preview */}
-                    <div className="w-full sm:w-36 h-48 rounded-xl bg-white border border-[#1B3B2B]/20 overflow-hidden shadow-inner flex items-center justify-center p-2 shrink-0 relative bg-[radial-gradient(#1B3B2B_1px,transparent_1px)] [background-size:8px_8px]">
-                      <div className="w-full h-full border border-[#D4AF37] p-2 text-center flex flex-col items-center justify-center space-y-1">
-                        <span className="font-serif text-[10px] font-bold text-[#1B3B2B]">شهادة تقدير وإجازة</span>
-                        <div className="w-8 h-8 rounded-full border border-[#D4AF37] mx-auto flex items-center justify-center text-[10px] font-serif text-[#D4AF37]">
-                          إجازة
+                          <span className="font-mono text-xs font-bold text-[#1B3B2B]">{video.progress}%</span>
                         </div>
-                        <span className="text-[7px] text-gray-500 block">Jamiya Sanad Document</span>
-                      </div>
-                    </div>
-
-                    {/* Right Details */}
-                    <div className="space-y-4 flex-1 flex flex-col justify-between">
-                      <div className="space-y-2">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold uppercase tracking-wider">
-                          <CheckCircle2 className="w-3 h-3" /> COURSE COMPLETION
-                        </span>
-                        <h4 className="font-serif font-bold text-xl text-[#1B3B2B] leading-tight">
-                          Tajweed Rules & Recitation
-                        </h4>
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          Awarded for demonstrating proficiency in the makharij, sifat, and Qirat rules of Quranic recitation.
-                        </p>
-                      </div>
-
-                      <div className="space-y-3 pt-2 border-t border-[#1B3B2B]/10">
-                        <div className="flex items-center justify-between text-xs">
-                          <div>
-                            <span className="text-[10px] text-muted-foreground block">Issue Date</span>
-                            <span className="font-bold text-[#1B3B2B]">15 Shaban 1445</span>
-                            <span className="text-[10px] text-muted-foreground block">Feb 25, 2024</span>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[10px] text-muted-foreground block">Credential ID</span>
-                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-white border border-gray-200">
-                              JKSF-TJ-8842
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => alert("Downloading official PDF Sanad Certificate...")}
-                            className="flex-1 py-2 px-3 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold hover:bg-[#2B543D] flex items-center justify-center gap-1.5 cursor-pointer"
-                          >
-                            <Download className="w-3.5 h-3.5 text-[#FED65B]" /> Download PDF
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => window.print()}
-                            className="py-2 px-3 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] text-xs font-semibold hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer"
-                          >
-                            <Printer className="w-3.5 h-3.5" /> Print
-                          </button>
+                        <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                          <div className="bg-[#1B3B2B] h-full rounded-full" style={{ width: `${video.progress}%` }} />
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Certificate Card 2 */}
-                  <div className="p-6 rounded-2xl bg-[#F5EFE6] border-2 border-[#D4AF37]/50 flex flex-col sm:flex-row gap-6 shadow-xs hover:shadow-md transition-all">
-                    {/* Left Thumbnail Preview */}
-                    <div className="w-full sm:w-36 h-48 rounded-xl bg-white border border-[#1B3B2B]/20 overflow-hidden shadow-inner flex items-center justify-center p-2 shrink-0 relative bg-[radial-gradient(#1B3B2B_1px,transparent_1px)] [background-size:8px_8px]">
-                      <div className="w-full h-full border border-[#D4AF37] p-2 text-center flex flex-col items-center justify-center space-y-1">
-                        <span className="font-serif text-[10px] font-bold text-[#1B3B2B]">شهادة تفوق وإجازة</span>
-                        <div className="w-8 h-8 rounded-full border border-[#D4AF37] mx-auto flex items-center justify-center text-[10px] font-serif text-[#D4AF37]">
-                          تفوق
-                        </div>
-                        <span className="text-[7px] text-gray-500 block">Jamiya Merit Sanad</span>
-                      </div>
-                    </div>
-
-                    {/* Right Details */}
-                    <div className="space-y-4 flex-1 flex flex-col justify-between">
-                      <div className="space-y-2">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#E5E7EB] text-[#374151] text-[10px] font-bold uppercase tracking-wider">
-                          <Star className="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]" /> ACADEMIC EXCELLENCE
-                        </span>
-                        <h4 className="font-serif font-bold text-xl text-[#1B3B2B] leading-tight">
-                          Annual Merit Award
-                        </h4>
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          Recognizing outstanding academic performance and commitment to Sanad studies.
-                        </p>
-                      </div>
-
-                      <div className="space-y-3 pt-2 border-t border-[#1B3B2B]/10">
-                        <div className="flex items-center justify-between text-xs">
-                          <div>
-                            <span className="text-[10px] text-muted-foreground block">Issue Date</span>
-                            <span className="font-bold text-[#1B3B2B]">30 Dhul-Hijjah 1444</span>
-                            <span className="text-[10px] text-muted-foreground block">Jul 18, 2023</span>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[10px] text-muted-foreground block">Credential ID</span>
-                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-white border border-gray-200">
-                              JKSF-AM-1029
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => alert("Downloading Annual Merit Award PDF...")}
-                            className="flex-1 py-2 px-3 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold hover:bg-[#2B543D] flex items-center justify-center gap-1.5 cursor-pointer"
-                          >
-                            <Download className="w-3.5 h-3.5 text-[#FED65B]" /> Download PDF
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => window.print()}
-                            className="py-2 px-3 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] text-xs font-semibold hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer"
-                          >
-                            <Printer className="w-3.5 h-3.5" /> Print
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
+                  ))}
                 </div>
-              </div>
 
-            </div>
-          )}
-
-          {/* TAB 5: DIGITAL LIBRARY */}
-          {activeTab === "library" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="space-y-1">
-                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Digital Library</h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Access our curated collection of reference books, study materials, and daily spiritual readings.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                {["All Files", "Reference Books", "Daily Duas", "Tafseer Kitabs", "Hadith Studies"].map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setLibraryCategory(cat)}
-                    className={`px-5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                      libraryCategory === cat
-                        ? "bg-[#1B3B2B] text-white shadow-sm"
-                        : "bg-white border border-gray-200 text-[#1B3B2B] hover:bg-[#F5EFE6]"
-                    }`}
-                  >
-                    {cat}
+                {/* Pagination Controls */}
+                <div className="flex items-center justify-center gap-2 pt-4">
+                  <button type="button" onClick={() => setRecordedPage(Math.max(1, recordedPage - 1))} className="p-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-[#1B3B2B] hover:bg-gray-50">
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { title: "Principles of Islamic Jurisprudence", subtitle: "Advanced Fiqh Studies", category: "REFERENCE", categoryBadgeClass: "bg-[#EFE9DD] text-[#4A4237]", iconBg: "bg-rose-100 text-rose-600", iconType: "pdf", size: "4.2 MB", date: "Oct 12, 2023", desc: "Comprehensive manual on Usul al-Fiqh, legal deduction, and sharia ruling methodologies." },
-                  { title: "Morning & Evening Supplications", subtitle: "Essential Adhkar from the Sunnah", category: "DAILY DUAS", categoryBadgeClass: "bg-[#FEF3C7] text-[#92400E]", iconBg: "bg-amber-100 text-amber-800", iconType: "book", size: "1.8 MB", date: "Nov 05, 2023", desc: "Authentic daily morning and evening adhkar, protection prayers, and prophetic supplications." },
-                  { title: "History of the Prophets", subtitle: "Detailed biographical accounts", category: "REFERENCE", categoryBadgeClass: "bg-[#EFE9DD] text-[#4A4237]", iconBg: "bg-rose-100 text-rose-600", iconType: "pdf", size: "8.5 MB", date: "Dec 20, 2023", desc: "Chronological accounts of the Prophets of Allah from Adam (AS) to Prophet Muhammad ﷺ." },
-                ].map((item, idx) => (
-                  <div key={idx} className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 shadow-xs flex flex-col justify-between space-y-5 hover:shadow-md transition-all">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${item.iconBg}`}>
-                          {item.iconType === "pdf" ? <span className="text-xs font-bold font-mono">PDF</span> : <Library className="w-5 h-5" />}
-                        </div>
-                        <span className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${item.categoryBadgeClass}`}>
-                          {item.category}
-                        </span>
-                      </div>
-
-                      <div>
-                        <h3 className="font-serif font-bold text-xl text-[#1B3B2B] leading-tight">{item.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">{item.subtitle}</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 pt-2 border-t border-[#1B3B2B]/10">
-                      <div className="flex items-center justify-between text-xs text-muted-foreground font-sans">
-                        <span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> {item.size}</span>
-                        <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {item.date}</span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <button type="button" onClick={() => setPreviewBook(item)} className="w-full flex items-center justify-center gap-2 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] py-2.5 text-xs font-semibold hover:bg-[#1B3B2B]/5 cursor-pointer">
-                          <Eye className="w-4 h-4" /> Preview
-                        </button>
-                        <a href="#" onClick={(e) => { e.preventDefault(); alert(`Downloading "${item.title}"`); }} className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1B3B2B] text-white py-2.5 text-xs font-semibold hover:bg-[#2B543D] cursor-pointer">
-                          <Download className="w-4 h-4 text-[#FED65B]" /> Download
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 6: ASSIGNMENTS */}
-          {activeTab === "assignments" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="space-y-4 border-b border-[#1B3B2B]/10 pb-3">
-                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Assignments</h2>
-
-                <div className="flex gap-8 text-sm font-semibold">
-                  {["pending", "submitted", "graded"].map((tab) => (
+                  {[1, 2, 3].map((p) => (
                     <button
-                      key={tab}
+                      key={p}
                       type="button"
-                      onClick={() => setAssignmentSubTab(tab as any)}
-                      className={`pb-2 capitalize cursor-pointer ${assignmentSubTab === tab ? "text-[#1B3B2B] font-bold border-b-2 border-[#1B3B2B]" : "text-muted-foreground"}`}
+                      onClick={() => setRecordedPage(p)}
+                      className={`w-9 h-9 rounded-xl text-xs font-bold ${
+                        recordedPage === p
+                          ? "bg-[#1B3B2B] text-white"
+                          : "bg-white border border-gray-200 text-[#1B3B2B] hover:bg-gray-50"
+                      }`}
                     >
-                      {tab}
+                      {p}
                     </button>
                   ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-5 space-y-4">
-                  {[
-                    { id: "fiqh-101", title: "Fiqh al-Ibadat: Purification", course: "Islamic Jurisprudence 101", due: "Oct 25", marks: "50 Marks", status: "PENDING", badgeClass: "bg-rose-100 text-rose-700" },
-                    { id: "tafsir-201", title: "Tafsir Surah Al-Fatiha", course: "Quranic Exegesis", due: "Oct 28", marks: "100 Marks", status: "PENDING", badgeClass: "bg-rose-100 text-rose-700" },
-                  ].map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => setSelectedAssignmentId(item.id)}
-                      className={`p-5 rounded-2xl border transition-all cursor-pointer space-y-3 ${selectedAssignmentId === item.id ? "bg-[#F5EFE6] border-[#1B3B2B]" : "bg-[#F5EFE6]/60 border-[#1B3B2B]/10"}`}
-                    >
-                      <div className="flex items-center justify-between text-xs">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.badgeClass}`}>{item.status}</span>
-                        <span className="text-muted-foreground">Due: {item.due}</span>
-                      </div>
-                      <h3 className="font-serif font-bold text-lg text-[#1B3B2B]">{item.title}</h3>
-                      <p className="text-xs text-muted-foreground">{item.course}</p>
-                      <div className="flex items-center gap-1.5 text-xs text-[#1B3B2B] font-semibold">
-                        <Star className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" /> {item.marks}
-                      </div>
-                    </div>
-                  ))}
+                  <span className="text-xs text-muted-foreground">...</span>
+                  <button type="button" onClick={() => setRecordedPage(recordedPage + 1)} className="p-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-[#1B3B2B] hover:bg-gray-50">
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <div className="lg:col-span-7">
-                  <div className="p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-6">
-                    <h2 className="font-serif font-bold text-2xl text-[#1B3B2B]">Fiqh al-Ibadat: Purification</h2>
-                    <p className="text-xs sm:text-sm text-[#1B3B2B]/80 leading-relaxed">
-                      Please write a comprehensive essay (1500 words) detailing the conditions and pillars of Wudu (ablution) according to the Hanafi school of thought. Include evidences from the Quran and Sunnah.
-                    </p>
-                    <div className="p-6 rounded-2xl bg-white border border-[#1B3B2B]/10 space-y-4">
-                      <h3 className="font-serif font-bold text-lg text-[#1B3B2B] flex items-center gap-2">
-                        <UploadCloud className="w-5 h-5 text-[#1B3B2B]" /> Submit Assignment
-                      </h3>
-                      <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center bg-[#FDFBF7]">
-                        <UploadCloud className="w-6 h-6 mx-auto text-[#1B3B2B]" />
-                        <p className="text-xs font-semibold text-[#1B3B2B] mt-2">
-                          {assignmentFile ? assignmentFile.name : "Drag and drop your file here, or click to browse"}
-                        </p>
-                        <input type="file" onChange={(e) => e.target.files?.[0] && setAssignmentFile(e.target.files[0])} className="hidden" id="asgn-file" />
-                        <label htmlFor="asgn-file" className="inline-block mt-3 px-4 py-1.5 rounded-lg bg-[#F5EFE6] text-xs font-bold border cursor-pointer">Choose File</label>
-                      </div>
-                      <div className="flex justify-end gap-3">
-                        <button type="button" onClick={() => alert("Submitted!")} className="px-6 py-2.5 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold cursor-pointer">Submit Assignment</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
+
             </div>
           )}
 
-          {/* TAB 7: ONLINE TESTS */}
-          {activeTab === "tests" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="border-b border-[#1B3B2B]/10 pb-4">
-                <h3 className="font-serif text-2xl font-bold text-[#1B3B2B]">Online Examinations & Quizzes</h3>
-                <p className="text-xs text-muted-foreground">Take scheduled multiple choice assessments and check instantly scored results.</p>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/15 space-y-4">
-                <h4 className="font-serif text-xl font-bold text-[#1B3B2B]">Tajweed Makharij & Sifat Online Quiz</h4>
-                <p className="text-xs text-muted-foreground">20 Multiple choice questions • 30 Minutes Duration • Passing Marks: 70%</p>
-                <button type="button" onClick={() => setActiveQuizModal(true)} className="rounded-xl bg-[#1B3B2B] text-white px-6 py-2.5 text-xs font-bold">Start Quiz →</button>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 8: ATTENDANCE */}
+          {/* TAB 4: ATTENDANCE (Screenshot 1 Exact Replica) */}
           {activeTab === "attendance" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Attendance</h2>
+              
+              <div className="space-y-1">
+                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Attendance</h2>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground">CONDUCTED CLASSES</span>
-                  <p className="font-serif font-bold text-4xl text-[#1B3B2B]">120</p>
+              {/* 4 Summary Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-xl bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">CONDUCTED CLASSES</span>
+                    <p className="font-serif font-bold text-4xl text-[#1B3B2B] mt-1">120</p>
+                  </div>
                 </div>
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground">PRESENT</span>
-                  <p className="font-serif font-bold text-4xl text-[#1B3B2B]">112</p>
+
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
+                    <Check className="w-5 h-5 stroke-[3]" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">PRESENT</span>
+                    <p className="font-serif font-bold text-4xl text-[#1B3B2B] mt-1">112</p>
+                  </div>
                 </div>
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground">ABSENT</span>
-                  <p className="font-serif font-bold text-4xl text-[#B91C1C]">5</p>
+
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
+                    <X className="w-5 h-5 stroke-[3]" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">ABSENT</span>
+                    <p className="font-serif font-bold text-4xl text-rose-700 mt-1">5</p>
+                  </div>
                 </div>
-                <div className="p-6 rounded-2xl bg-[#1B3B2B] text-white space-y-2 border border-[#D4AF37]/30">
-                  <span className="text-[10px] font-bold uppercase text-[#FED65B]">ATTENDANCE %</span>
-                  <p className="font-serif font-bold text-4xl text-[#FED65B]">94%</p>
+
+                <div className="p-6 rounded-2xl bg-[#1B3B2B] text-white space-y-4 shadow-md border border-[#D4AF37]/30">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#FED65B]">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FED65B] block">ATTENDANCE %</span>
+                    <p className="font-serif font-bold text-4xl text-[#FED65B] mt-1">94%</p>
+                  </div>
                 </div>
               </div>
+
+              {/* Bottom Split Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                <div className="lg:col-span-5 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">{calendarMonth}</h3>
+                    <div className="flex items-center gap-1">
+                      <button type="button" onClick={() => setCalendarMonth("September 2023")} className="p-1 text-[#1B3B2B] hover:bg-[#1B3B2B]/10 rounded-lg">
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button type="button" onClick={() => setCalendarMonth("October 2023")} className="p-1 text-[#1B3B2B] hover:bg-[#1B3B2B]/10 rounded-lg">
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-muted-foreground">
+                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold">
+                    <span className="p-2"></span>
+                    <span className="p-2 text-gray-700">1</span>
+                    {[2, 3, 4, 5].map((d) => (
+                      <span key={d} className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">
+                        {d}
+                      </span>
+                    ))}
+                    <span className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center mx-auto">6</span>
+                    {[7, 8].map((d) => (<span key={d} className="p-2 text-gray-700">{d}</span>))}
+                    {[9, 10].map((d) => (
+                      <span key={d} className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">
+                        {d}
+                      </span>
+                    ))}
+                    <span className="w-8 h-8 rounded-full bg-[#D4AF37] text-[#1B3B2B] font-bold flex items-center justify-center mx-auto">11</span>
+                    <span className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">12</span>
+                    <span className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">13</span>
+                    <span className="p-2 text-gray-700">14</span>
+                    <span className="p-2 text-gray-700">15</span>
+                    <span className="w-8 h-8 rounded-full bg-[#D4AF37] text-[#1B3B2B] font-bold flex items-center justify-center mx-auto ring-2 ring-[#1B3B2B]">16</span>
+                    {[17, 18, 19, 20, 21].map((d) => (<span key={d} className="p-2 text-gray-400">{d}</span>))}
+                  </div>
+
+                  <div className="pt-4 border-t border-[#1B3B2B]/10 flex items-center justify-start gap-6 text-xs text-muted-foreground font-medium">
+                    <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#36493F]" /> Present</span>
+                    <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-rose-500" /> Absent</span>
+                    <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" /> Excused</span>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-7 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Attendance Log</h3>
+                    <button type="button" onClick={() => alert("Exporting log...")} className="flex items-center gap-1.5 text-xs font-semibold text-[#1B3B2B] hover:underline">
+                      <Download className="w-3.5 h-3.5" /> Export
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead>
+                        <tr className="border-b border-[#1B3B2B]/10 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
+                          <th className="py-3">DATE</th>
+                          <th className="py-3">SUBJECT</th>
+                          <th className="py-3">TEACHER</th>
+                          <th className="py-3 text-right">STATUS</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#1B3B2B]/10">
+                        {[
+                          { date: "Oct 16, 2023", subject: "Islamic History", teacher: "Sheikh Abdullah", status: "Present", badge: "bg-emerald-100 text-emerald-800" },
+                          { date: "Oct 13, 2023", subject: "Quranic Studies", teacher: "Ustadh Rahman", status: "Present", badge: "bg-emerald-100 text-emerald-800" },
+                          { date: "Oct 11, 2023", subject: "Arabic Grammar", teacher: "Ustadh Rahman", status: "Excused", badge: "bg-amber-100 text-amber-800" },
+                          { date: "Oct 06, 2023", subject: "Hadith", teacher: "Sheikh Abdullah", status: "Absent", badge: "bg-rose-100 text-rose-700" },
+                          { date: "Oct 05, 2023", subject: "Islamic History", teacher: "Sheikh Abdullah", status: "Present", badge: "bg-emerald-100 text-emerald-800" },
+                        ].map((row, idx) => (
+                          <tr key={idx} className="hover:bg-[#1B3B2B]/5 transition-colors">
+                            <td className="py-3.5 font-medium text-[#1B3B2B]">{row.date}</td>
+                            <td className="py-3.5 font-bold text-[#1B3B2B]">{row.subject}</td>
+                            <td className="py-3.5 text-muted-foreground">{row.teacher}</td>
+                            <td className="py-3.5 text-right">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.badge}`}>{row.status}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="pt-2 text-center">
+                    <button type="button" onClick={() => alert("Loading older logs...")} className="text-xs font-semibold text-[#1B3B2B] hover:underline">
+                      View Older Logs
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           )}
 
-          {/* TAB 9: PROGRESS REPORT */}
+          {/* TAB 5: PROGRESS REPORT (Screenshot 2 Exact Replica) */}
           {activeTab === "report" && (
             <div className="space-y-6 animate-in fade-in duration-300">
+              
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1B3B2B]/10 pb-4">
                 <div>
                   <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Academic Progress</h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Term 1: Fall 2023 - Overall Performance</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Term 1: Fall 2023 - Overall Performance</p>
                 </div>
-                <button type="button" onClick={() => alert("Downloading PDF...")} className="px-5 py-2.5 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => alert("Generating & Downloading Official PDF Report Card...")}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold hover:bg-[#e9c349] transition-colors shadow-xs cursor-pointer"
+                >
                   <Download className="w-4 h-4" /> Download Official Report Card (PDF)
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div className="lg:col-span-8 p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
-                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Grade Trends</h3>
-                  <div className="h-44 w-full flex items-center justify-center font-serif text-lg font-bold text-[#1B3B2B]">
-                    Average Grade: 91% (A+) Across All Term Modules
+              {/* Grade Trends & Term Summary */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+                <div className="lg:col-span-8 p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 flex flex-col justify-between shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Grade Trends</h3>
+                    <span className="px-3 py-1 rounded-full bg-[#E8E0D2] text-[#1B3B2B] text-[10px] font-bold uppercase tracking-wider">
+                      TERM 1
+                    </span>
+                  </div>
+
+                  <div className="w-full pt-4 pb-2">
+                    <svg viewBox="0 0 500 180" className="w-full h-44 overflow-visible">
+                      {[0, 30, 60, 90, 120, 150].map((y, idx) => (
+                        <line key={idx} x1="30" y1={y + 10} x2="480" y2={y + 10} stroke="#1B3B2B" strokeOpacity="0.08" strokeDasharray="4 4" />
+                      ))}
+                      <text x="5" y="15" fill="#71717A" fontSize="9" className="font-mono">100</text>
+                      <text x="5" y="45" fill="#71717A" fontSize="9" className="font-mono">95</text>
+                      <text x="5" y="75" fill="#71717A" fontSize="9" className="font-mono">90</text>
+                      <text x="5" y="105" fill="#71717A" fontSize="9" className="font-mono">85</text>
+                      <text x="5" y="135" fill="#71717A" fontSize="9" className="font-mono">80</text>
+                      <text x="5" y="165" fill="#71717A" fontSize="9" className="font-mono">60</text>
+
+                      <path d="M 50 100 Q 120 75 190 90 T 330 65 T 470 70 L 470 160 L 50 160 Z" fill="#36493F" fillOpacity="0.12" />
+                      <path d="M 50 100 Q 120 75 190 90 T 330 65 T 470 70" fill="none" stroke="#36493F" strokeWidth="3" />
+                      {[
+                        { x: 50, y: 100 }, { x: 120, y: 80 }, { x: 190, y: 90 }, { x: 260, y: 72 }, { x: 330, y: 82 }, { x: 400, y: 55 }, { x: 470, y: 68 }
+                      ].map((pt, i) => (
+                        <circle key={i} cx={pt.x} cy={pt.y} r="4" fill="#D4AF37" stroke="#36493F" strokeWidth="2" />
+                      ))}
+
+                      <text x="40" y="178" fill="#71717A" fontSize="9">Week 1</text>
+                      <text x="110" y="178" fill="#71717A" fontSize="9">Week 2</text>
+                      <text x="180" y="178" fill="#71717A" fontSize="9">Week 3</text>
+                      <text x="250" y="178" fill="#71717A" fontSize="9">Week 4</text>
+                      <text x="320" y="178" fill="#71717A" fontSize="9">Week 5</text>
+                      <text x="390" y="178" fill="#71717A" fontSize="9">Week 6</text>
+                      <text x="450" y="178" fill="#71717A" fontSize="9">Midterm</text>
+                    </svg>
                   </div>
                 </div>
-                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border space-y-3">
+
+                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
                   <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Term Summary</h3>
-                  <div className="p-3 bg-white rounded-xl border text-xs font-bold">OVERALL GPA: 3.8</div>
-                  <div className="p-3 bg-white rounded-xl border text-xs font-bold">ATTENDANCE: 95%</div>
-                  <div className="p-3 bg-white rounded-xl border text-xs font-bold">CLASS RANK: 4th</div>
+
+                  <div className="space-y-3 relative z-10">
+                    <div className="p-4 rounded-xl bg-white/80 border border-[#1B3B2B]/10 flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block">OVERALL GPA</span>
+                        <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-0.5">3.8</p>
+                      </div>
+                      <ArrowUpRight className="w-5 h-5 text-[#1B3B2B]" />
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-white/80 border border-[#1B3B2B]/10 flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block">ATTENDANCE</span>
+                        <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-0.5">95%</p>
+                      </div>
+                      <Check className="w-5 h-5 text-emerald-700 stroke-[3]" />
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-white/80 border border-[#1B3B2B]/10 flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block">CLASS RANK</span>
+                        <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-0.5">4<span className="text-lg font-sans">th</span></p>
+                      </div>
+                      <TrendingUp className="w-5 h-5 text-[#D4AF37]" />
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* Subject Breakdown Table */}
+              <div className="p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
+                <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Subject Breakdown</h3>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead>
+                      <tr className="border-b border-[#1B3B2B]/10 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
+                        <th className="py-3">SUBJECT</th>
+                        <th className="py-3">QUIZ AVG</th>
+                        <th className="py-3">ASSIGNMENTS</th>
+                        <th className="py-3">MIDTERM EXAM</th>
+                        <th className="py-3">FINAL GRADE</th>
+                        <th className="py-3 text-right">STATUS</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#1B3B2B]/10">
+                      {[
+                        { subject: "Islamic History", icon: "📖", quiz: "92%", assignments: "95%", midterm: "88%", final: "91% (A)", status: "Excellent", badge: "bg-emerald-100 text-emerald-800" },
+                        { subject: "Arabic Grammar", icon: "🔤", quiz: "85%", assignments: "88%", midterm: "92%", final: "89% (B+)", status: "Good", badge: "bg-emerald-100 text-emerald-800" },
+                        { subject: "Quranic Studies", icon: "📖", quiz: "98%", assignments: "100%", midterm: "96%", final: "98% (A+)", status: "Outstanding", badge: "bg-amber-100 text-amber-800" },
+                        { subject: "Mathematics", icon: "📐", quiz: "78%", assignments: "82%", midterm: "75%", final: "79% (C+)", status: "Satisfactory", badge: "bg-gray-200 text-gray-700" },
+                      ].map((row, idx) => (
+                        <tr key={idx} className="hover:bg-[#1B3B2B]/5 transition-colors">
+                          <td className="py-4 font-bold text-[#1B3B2B] flex items-center gap-2">
+                            <span>{row.icon}</span> <span>{row.subject}</span>
+                          </td>
+                          <td className="py-4 text-[#1B3B2B] font-medium">{row.quiz}</td>
+                          <td className="py-4 text-[#1B3B2B] font-medium">{row.assignments}</td>
+                          <td className="py-4 text-[#1B3B2B] font-medium">{row.midterm}</td>
+                          <td className="py-4 font-bold text-[#1B3B2B]">{row.final}</td>
+                          <td className="py-4 text-right">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${row.badge}`}>{row.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Teacher's Remarks */}
+              <div className="p-6 sm:p-8 rounded-2xl bg-[#1B3B2B] text-white space-y-4 shadow-xl border border-[#D4AF37]/30 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                <div className="w-16 h-16 rounded-full border-2 border-[#D4AF37] overflow-hidden shrink-0 shadow-md">
+                  <img
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+                    alt="Teacher Advisor"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-serif text-lg font-bold text-[#FED65B] flex items-center gap-2">
+                    <span className="text-2xl">❝</span> Teacher's Remarks
+                  </h4>
+                  <p className="text-xs sm:text-sm text-white/90 italic leading-relaxed">
+                    "The student has shown exceptional dedication to Quranic Studies and Islamic History this term. Their participation in class discussions is insightful and inspiring to peers. While Mathematics remains an area for growth, consistent effort is evident. Continued focus on analytical problem-solving will yield great results."
+                  </p>
+                  <p className="text-xs font-semibold text-white/70 pt-1">
+                    <strong className="text-[#FED65B]">Ustadha Amina Rashid</strong> | Head Advisor
+                  </p>
+                </div>
+              </div>
+
             </div>
           )}
 
-          {/* TAB 10: FEE STATUS (Corrected Rupees ₹ Fee Info matching User prompt) */}
+          {/* TAB 6: FEE STATUS (Rupees ₹) */}
           {activeTab === "fee" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              
-              {/* Main Heading & Subtitle */}
               <div className="space-y-1">
                 <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Financial Overview</h2>
                 <p className="text-xs sm:text-sm text-muted-foreground">
@@ -1440,31 +1342,23 @@ export function StudentDashboardPage() {
                 </p>
               </div>
 
-              {/* Top Summary Metric Cards (4 Cards matching Screenshot 4 in Indian Rupees ₹) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                
-                {/* Card 1: Total Fee */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
                   <div className="w-10 h-10 rounded-xl bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
                     <Receipt className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                      TOTAL FEE (ANNUAL)
-                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">TOTAL FEE (ANNUAL)</span>
                     <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-1">₹6,000.00</p>
                   </div>
                 </div>
 
-                {/* Card 2: Paid Amount with progress bar */}
                 <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
                   <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
                     <Check className="w-5 h-5 stroke-[3]" />
                   </div>
                   <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                      PAID AMOUNT
-                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">PAID AMOUNT</span>
                     <p className="font-serif font-bold text-3xl text-[#1B3B2B]">₹4,500.00</p>
                     <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                       <div className="bg-[#1B3B2B] h-full rounded-full w-[75%]" />
@@ -1472,48 +1366,37 @@ export function StudentDashboardPage() {
                   </div>
                 </div>
 
-                {/* Card 3: Due Balance */}
                 <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
                   <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
                     <AlertTriangle className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                      DUE BALANCE
-                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">DUE BALANCE</span>
                     <p className="font-serif font-bold text-3xl text-rose-700 mt-1">₹1,500.00</p>
                   </div>
                 </div>
 
-                {/* Card 4: Next Due Date (Dark Green Card with Gold Pay Button) */}
                 <div className="p-6 rounded-2xl bg-[#1B3B2B] text-white space-y-4 shadow-md border border-[#D4AF37]/30 flex flex-col justify-between">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FED65B] block">
-                      NEXT DUE DATE
-                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FED65B] block">NEXT DUE DATE</span>
                     <p className="font-serif font-bold text-2xl text-white mt-1">Nov 15, 2026</p>
                     <p className="text-xs text-white/70 mt-0.5 font-sans">Installment: ₹500.00</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setPaymentModalOpen(true)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold uppercase tracking-wider hover:bg-[#e9c349] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold uppercase tracking-wider hover:bg-[#e9c349] transition-colors cursor-pointer shadow-sm"
                   >
                     Pay Online →
                   </button>
                 </div>
-
               </div>
 
-              {/* Payment History Table in Rupees ₹ (matching Screenshot 4) */}
+              {/* Payment History Table */}
               <div className="p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
                 <div className="flex items-center justify-between border-b border-[#1B3B2B]/10 pb-4">
                   <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Payment History</h3>
-                  <button
-                    type="button"
-                    onClick={() => alert("Downloading full account statement PDF...")}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] text-xs font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
-                  >
+                  <button type="button" onClick={() => alert("Downloading statement...")} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] text-xs font-semibold hover:bg-gray-50">
                     <Download className="w-3.5 h-3.5" /> Download Statement
                   </button>
                 </div>
@@ -1541,18 +1424,9 @@ export function StudentDashboardPage() {
                           <td className="py-4 text-[#1B3B2B]">{row.date}</td>
                           <td className={`py-4 font-bold ${row.isFailed ? "text-rose-600" : "text-[#1B3B2B]"}`}>{row.amount}</td>
                           <td className="py-4 text-[#1B3B2B]">{row.mode}</td>
-                          <td className="py-4">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.badge}`}>
-                              {row.status}
-                            </span>
-                          </td>
+                          <td className="py-4"><span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.badge}`}>{row.status}</span></td>
                           <td className="py-4 text-right">
-                            <button
-                              type="button"
-                              onClick={() => alert(`Downloading Receipt #${row.receipt}`)}
-                              className="p-1.5 rounded-lg text-[#1B3B2B] hover:bg-[#1B3B2B]/10"
-                              title="Download Receipt"
-                            >
+                            <button type="button" onClick={() => alert(`Downloading Receipt #${row.receipt}`)} className="p-1.5 rounded-lg text-[#1B3B2B] hover:bg-[#1B3B2B]/10">
                               <FileCheck className="w-4 h-4" />
                             </button>
                           </td>
@@ -1562,136 +1436,138 @@ export function StudentDashboardPage() {
                   </table>
                 </div>
               </div>
+            </div>
+          )}
 
-              {/* Online Payment Modal */}
-              {paymentModalOpen && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-                  <div className="bg-[#F5EFE6] w-full max-w-md rounded-2xl p-6 space-y-5 shadow-2xl border border-[#1B3B2B]/20 animate-in zoom-in-95">
-                    <div className="flex items-center justify-between border-b border-[#1B3B2B]/10 pb-3">
-                      <h4 className="font-serif text-xl font-bold text-[#1B3B2B]">Online Installment Payment</h4>
-                      <button type="button" onClick={() => setPaymentModalOpen(false)} className="p-1 text-[#1B3B2B] hover:bg-[#1B3B2B]/10 rounded-lg">
-                        <X className="w-5 h-5" />
-                      </button>
+          {/* TAB 7: CERTIFICATES */}
+          {activeTab === "certificates" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="space-y-1">
+                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Certificates</h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex items-center gap-4 shadow-xs">
+                  <div className="w-12 h-12 rounded-full bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
+                    <Award className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">TOTAL EARNED</span>
+                    <p className="font-serif font-bold text-3xl text-[#1B3B2B]">2</p>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex items-center gap-4 shadow-xs">
+                  <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center text-[#92400E]">
+                    <Clock className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">IN PROGRESS</span>
+                    <p className="font-serif font-bold text-3xl text-[#1B3B2B]">1</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-5 pt-2">
+                <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">Earned Certificates</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-6 rounded-2xl bg-[#F5EFE6] border-2 border-[#D4AF37]/50 flex flex-col sm:flex-row gap-6 shadow-xs">
+                    <div className="w-full sm:w-36 h-48 rounded-xl bg-white border border-[#1B3B2B]/20 p-2 shrink-0 flex items-center justify-center text-center">
+                      <span className="font-serif text-xs font-bold text-[#1B3B2B]">شهادة تقدير وإجازة</span>
                     </div>
-
-                    <div className="p-4 rounded-xl bg-white space-y-2 text-xs border border-[#1B3B2B]/10">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Installment Amount:</span>
-                        <span className="font-bold text-lg text-[#1B3B2B]">₹500.00</span>
+                    <div className="space-y-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold uppercase">
+                          COURSE COMPLETION
+                        </span>
+                        <h4 className="font-serif font-bold text-xl text-[#1B3B2B] mt-2">Tajweed Rules & Recitation</h4>
+                        <p className="text-xs text-muted-foreground mt-1">Awarded for demonstrating proficiency in Quranic recitation rules.</p>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Due Date:</span>
-                        <span className="font-semibold text-rose-700">Nov 15, 2026</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 text-xs">
-                      <label className="block font-semibold text-[#1B3B2B]">Select Payment Method</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            alert("Opening UPI / GPay / PhonePe Gateway...");
-                            setPaymentModalOpen(false);
-                          }}
-                          className="p-3 rounded-xl bg-white border border-[#1B3B2B]/20 hover:border-[#1B3B2B] text-center font-bold text-[#1B3B2B]"
-                        >
-                          📲 UPI / GPay
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            alert("Redirecting to Indian Bank NetBanking Portal...");
-                            setPaymentModalOpen(false);
-                          }}
-                          className="p-3 rounded-xl bg-white border border-[#1B3B2B]/20 hover:border-[#1B3B2B] text-center font-bold text-[#1B3B2B]"
-                        >
-                          🏦 Net Banking
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => alert("Downloading PDF...")} className="flex-1 py-2 px-3 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold flex items-center justify-center gap-1.5">
+                          <Download className="w-3.5 h-3.5 text-[#FED65B]" /> Download PDF
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
-
+              </div>
             </div>
           )}
 
-          {/* TAB 11: MY COURSES */}
+          {/* OTHER TABS (DIGITAL LIBRARY, ASSIGNMENTS, ONLINE TESTS, LIVE CLASSES, COURSES) */}
+          {activeTab === "library" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Digital Library</h2>
+              <p className="text-xs text-muted-foreground">Access our curated collection of reference books and study materials.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { title: "Principles of Islamic Jurisprudence", category: "REFERENCE", size: "4.2 MB", date: "Oct 12, 2023" },
+                  { title: "Morning & Evening Supplications", category: "DAILY DUAS", size: "1.8 MB", date: "Nov 05, 2023" },
+                  { title: "History of the Prophets", category: "REFERENCE", size: "8.5 MB", date: "Dec 20, 2023" },
+                ].map((item, idx) => (
+                  <div key={idx} className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4">
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#EFE9DD] text-[#4A4237]">{item.category}</span>
+                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">{item.title}</h3>
+                    <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t border-[#1B3B2B]/10">
+                      <span>{item.size}</span>
+                      <span>{item.date}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "assignments" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Assignments</h2>
+              <div className="p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
+                <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Fiqh al-Ibadat: Purification</h3>
+                <p className="text-xs text-muted-foreground">Due: Oct 25, 11:59 PM • 50 Marks</p>
+                <p className="text-xs text-[#1B3B2B]/80 leading-relaxed">
+                  Please write a comprehensive essay (1500 words) detailing the conditions and pillars of Wudu (ablution) according to the Hanafi school of thought. Include evidences from the Quran and Sunnah.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "tests" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Online Examinations & Quizzes</h2>
+              <div className="p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
+                <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Tajweed Makharij & Sifat Online Quiz</h3>
+                <button type="button" onClick={() => alert("Starting Quiz...")} className="px-6 py-2.5 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold">Start Quiz →</button>
+              </div>
+            </div>
+          )}
+
           {activeTab === "courses" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1B3B2B]/10 pb-4">
-                <div>
-                  <h3 className="font-serif text-2xl font-bold text-[#1B3B2B]">My Registered Courses</h3>
-                  <p className="text-xs text-muted-foreground">Access syllabus, lecture notes, and assignments for your enrolled programs.</p>
-                </div>
-                <span className="px-3.5 py-1 rounded-full bg-[#1B3B2B] text-white text-xs font-bold uppercase tracking-wider">
-                  4 Enrolled Courses
-                </span>
-              </div>
-
+              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">My Courses</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
-                  { title: "Alimiyya Degree Course (Year 2)", badge: "ALIMIA • SANAD", progress: 82, modules: "24 Modules Completed", instructor: "Muftia Fatima Ali Hashmi" },
-                  { title: "Tajweed & Qirat - Level 2", badge: "TAJWEED • SPECIALIZATION", progress: 65, modules: "18 Modules Completed", instructor: "Ustadha Ayesha" },
-                  { title: "Arabic Grammar (Nahw)", badge: "ARABIC GRAMMAR", progress: 40, modules: "12 Modules Completed", instructor: "Ustadha Fatima" },
-                  { title: "Hadith & Sunnah Studies", badge: "HADITH STUDIES", progress: 55, modules: "15 Modules Completed", instructor: "Alima Zoya Khan" },
+                  { title: "Alimiyya Degree Course (Year 2)", instructor: "Muftia Fatima Ali Hashmi" },
+                  { title: "Tajweed & Qirat - Level 2", instructor: "Ustadha Ayesha" },
+                  { title: "Arabic Grammar (Nahw)", instructor: "Ustadha Fatima" },
                 ].map((c, i) => (
-                  <div key={i} className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/15 space-y-4 flex flex-col justify-between hover:shadow-md transition-all">
-                    <div className="space-y-3">
-                      <span className="inline-block px-3 py-1 rounded-full bg-[#1B3B2B] text-white text-[10px] font-bold uppercase tracking-widest">
-                        {c.badge}
-                      </span>
-                      <h4 className="font-serif text-xl font-bold text-[#1B3B2B]">{c.title}</h4>
-                      <p className="text-xs text-[#1B3B2B] font-semibold">Instructor: {c.instructor}</p>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs font-semibold">
-                          <span>Syllabus Covered</span>
-                          <span>{c.progress}%</span>
-                        </div>
-                        <div className="w-full bg-[#1B3B2B]/15 rounded-full h-2">
-                          <div className="bg-[#1B3B2B] h-2 rounded-full" style={{ width: `${c.progress}%` }} />
-                        </div>
-                      </div>
-                    </div>
-                    <button type="button" className="w-full rounded-xl bg-[#1B3B2B] text-white py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#2B543D]">
-                      Open Course Modules →
-                    </button>
+                  <div key={i} className="p-6 rounded-2xl bg-[#F5EFE6] border space-y-3">
+                    <h4 className="font-serif font-bold text-xl text-[#1B3B2B]">{c.title}</h4>
+                    <p className="text-xs text-muted-foreground">Instructor: {c.instructor}</p>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* TAB 12: RECORDED CLASSES */}
-          {activeTab === "recorded-classes" && (
+          {activeTab === "live-classes" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="border-b border-[#1B3B2B]/10 pb-4">
-                <h3 className="font-serif text-2xl font-bold text-[#1B3B2B]">Recorded Video Lecture Library</h3>
-                <p className="text-xs text-muted-foreground">Replay past lectures anytime for revision and exam prep.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { title: "Surah Al-Baqarah Ayah 255-286 Detailed Tafseer", date: "26 July 2026", duration: "52 Mins", category: "TAFSEER" },
-                  { title: "Tajweed Rules: Ghunna & Ikhfa Masterclass", date: "24 July 2026", duration: "45 Mins", category: "TAJWEED" },
-                  { title: "Hadith 1: Intentions (Innamal A'malu Bin Niyyat)", date: "22 July 2026", duration: "60 Mins", category: "HADITH" },
-                  { title: "Fiqh-e-Hanafi: Masail-e-Taharat & Wudu", date: "20 July 2026", duration: "50 Mins", category: "FIQH" },
-                ].map((v, i) => (
-                  <div key={i} className="p-5 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/15 space-y-3 hover:shadow-md transition-all">
-                    <div className="h-40 rounded-xl bg-[#1B3B2B] flex items-center justify-center text-white relative overflow-hidden group">
-                      <PlayCircle className="w-12 h-12 text-[#D4AF37] group-hover:scale-110 transition-transform cursor-pointer" />
-                      <span className="absolute top-2 left-2 bg-[#D4AF37] text-[#1B3B2B] px-2 py-0.5 rounded text-[9px] font-bold uppercase">
-                        {v.category}
-                      </span>
-                      <span className="absolute bottom-2 right-2 bg-black/70 px-2 py-0.5 rounded text-[10px] font-mono text-white">
-                        {v.duration}
-                      </span>
-                    </div>
-                    <h5 className="font-serif font-bold text-base text-[#1B3B2B]">{v.title}</h5>
-                    <p className="text-[11px] text-muted-foreground">Recorded on: {v.date}</p>
-                  </div>
-                ))}
+              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Live Interactive Classrooms</h2>
+              <div className="p-8 rounded-2xl bg-[#1B3B2B] text-white space-y-4">
+                <span className="px-3 py-1 rounded-full bg-red-500 text-xs font-bold uppercase">LIVE NOW</span>
+                <h3 className="font-serif text-3xl font-bold">Advanced Fiqh Studies</h3>
+                <p className="text-xs text-white/80">Shaykh Abdullah Al-Mahmoud • 06:00 PM - 07:30 PM (IST)</p>
+                <a href="https://zoom.us" target="_blank" rel="noreferrer" className="inline-block px-6 py-3 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold uppercase">Join Live Class →</a>
               </div>
             </div>
           )}

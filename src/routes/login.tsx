@@ -95,7 +95,7 @@ export function LoginPage() {
                 <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" /> State Registered
               </span>
               <span>•</span>
-              <span>100% Secure Supabase Auth</span>
+              <span>100% Secure Authentication</span>
             </div>
 
             {/* Background Ornamental Emblem */}
@@ -188,7 +188,7 @@ export function LoginPage() {
                       d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.58l3.99 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
                     />
                   </svg>
-                  <span>{googleLoading ? "Connecting Google Auth..." : "Continue with Google (Supabase)"}</span>
+                  <span>{googleLoading ? "Connecting Google Auth..." : "Continue with Google"}</span>
                 </button>
 
                 <div className="flex items-center gap-3 text-center my-2">
@@ -236,7 +236,7 @@ export function LoginPage() {
                 disabled={loading}
                 className="w-full rounded-full bg-[#1B3B2B] text-white py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-[#244b37] transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
               >
-                <span>{loading ? "Authenticating via Supabase..." : role === "student" ? "Sign In to Dashboard →" : "Sign In to Admin Panel →"}</span>
+                <span>{loading ? "Authenticating..." : role === "student" ? "Sign In to Dashboard →" : "Sign In to Admin Panel →"}</span>
                 <ArrowRight className="w-4 h-4 text-[#FED65B]" />
               </button>
 
@@ -257,7 +257,7 @@ export function LoginPage() {
             </form>
 
             <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1">
-              <Lock className="w-3 h-3 text-[#1B3B2B]" /> Protected by Supabase 256-bit SSL Auth
+              <Lock className="w-3 h-3 text-[#1B3B2B]" /> Protected by 256-bit SSL Encryption
             </p>
           </div>
 

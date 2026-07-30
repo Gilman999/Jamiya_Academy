@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-[#1B3B2B]";
-import { createFileRoute as createRoute } from "@tanstack/react-router";
+import { useState, useEffect, useRef } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   BookOpen,
@@ -41,11 +40,14 @@ import {
   RotateCcw,
   SlidersHorizontal,
   Calendar as CalendarIcon,
-  Play
+  Play,
+  Lock,
+  Mail,
+  CheckCircle
 } from "lucide-react";
 import { getCurrentStudent, signOutStudent, StudentProfile, DEMO_STUDENT } from "@/lib/supabase";
 
-export const Route = createRoute("/dashboard")({
+export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Student Portal Dashboard — Jamiya Kaneez E Sayyeda Fatima Lilbanat ﷺ" },
@@ -75,7 +77,7 @@ export function StudentDashboardPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Live Class Countdown State (02:45:10)
+  // Countdown Timer State (02:45:10)
   const [timer, setTimer] = useState({ hours: 2, minutes: 45, seconds: 10 });
 
   useEffect(() => {
@@ -112,7 +114,12 @@ export function StudentDashboardPage() {
   // Fee State
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
-  // Profile Edit State (NO AVATAR PHOTO AS REQUESTED)
+  // Courses Tab State (Screenshot 1 Exact replica)
+  const [selectedCourseId, setSelectedCourseId] = useState<string>("tajweed-qirat");
+
+  // Profile Photo Upload State & Handlers
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarSrc, setAvatarSrc] = useState<string>("https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingGuardian, setIsEditingGuardian] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -127,12 +134,27 @@ export function StudentDashboardPage() {
     emailNotifications: true,
   });
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const newUrl = URL.createObjectURL(file);
+      setAvatarSrc(newUrl);
+      alert("Profile picture updated successfully!");
+    }
+  };
+
   // Quiz State
   const [activeQuizModal, setActiveQuizModal] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
-  // Notifications Modal
+  // Certificates Filter State
+  const [certFilter, setCertFilter] = useState<"All" | "Completed">("Completed");
+
+  // Reminders State
+  const [remindersSet, setRemindersSet] = useState<Record<string, boolean>>({ "rem-1": true });
+
+  // Notifications Modal State
   const [notifOpen, setNotifOpen] = useState(false);
 
   useEffect(() => {
@@ -140,6 +162,7 @@ export function StudentDashboardPage() {
       const current = await getCurrentStudent();
       if (current) {
         setStudent(current);
+        if (current.avatarUrl) setAvatarSrc(current.avatarUrl);
       } else {
         setStudent(DEMO_STUDENT);
       }
@@ -169,7 +192,7 @@ export function StudentDashboardPage() {
   const navItems = [
     { id: "overview", label: "Dashboard Home", icon: LayoutDashboard },
     { id: "profile", label: "My Profile", icon: User },
-    { id: "courses", label: "My Courses", icon: BookOpen, badge: "4 Active" },
+    { id: "courses", label: "My Courses", icon: BookOpen, badge: "3 Active" },
     { id: "live-classes", label: "Live Classes", icon: Video, badge: "LIVE NOW" },
     { id: "recorded-classes", label: "Recorded Classes", icon: PlayCircle },
     { id: "library", label: "Digital Library", icon: Library },
@@ -324,7 +347,7 @@ export function StudentDashboardPage() {
 
             {/* Page Title or Greeting */}
             <div>
-              {activeTab === "overview" || activeTab === "fee" || activeTab === "report" || activeTab === "profile" || activeTab === "live-classes" || activeTab === "recorded-classes" ? (
+              {activeTab === "overview" || activeTab === "fee" || activeTab === "report" || activeTab === "profile" || activeTab === "live-classes" || activeTab === "recorded-classes" || activeTab === "courses" ? (
                 <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#1B3B2B]">
                   Welcome back, Student
                 </h2>
@@ -342,7 +365,7 @@ export function StudentDashboardPage() {
               <Search className="w-4 h-4 text-muted-foreground shrink-0" />
               <input
                 type="text"
-                placeholder={activeTab === "library" ? "Search digital library..." : "Search..."}
+                placeholder={activeTab === "library" ? "Search digital library..." : activeTab === "courses" ? "Search courses..." : "Search..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-transparent focus:outline-none w-full text-xs text-[#1B3B2B]"
@@ -391,14 +414,14 @@ export function StudentDashboardPage() {
               <Video className="w-4 h-4" />
             </button>
 
-            {/* User Profile Icon */}
+            {/* User Profile Circle Icon */}
             <button
               type="button"
               onClick={() => setActiveTab("profile")}
-              className="p-2 rounded-full bg-[#F5EFE6] hover:bg-[#1B3B2B]/10 text-[#1B3B2B] transition-colors cursor-pointer"
+              className="p-[#D4AF37] rounded-full border-2 border-[#D4AF37] hover:opacity-90 transition-opacity cursor-pointer overflow-hidden"
               title="My Profile"
             >
-              <User className="w-4 h-4" />
+              <img src={avatarSrc} alt="Profile" className="w-7 h-7 rounded-full object-cover" />
             </button>
           </div>
         </header>
@@ -594,17 +617,43 @@ export function StudentDashboardPage() {
             </div>
           )}
 
-          {/* TAB 2: MY PROFILE (NO PROFILE PICTURE AVATAR AS REQUESTED) */}
+          {/* TAB 2: MY PROFILE (WITH INTERACTIVE PROFILE PHOTO UPLOAD AS REQUESTED) */}
           {activeTab === "profile" && (
             <div className="space-y-6 animate-in fade-in duration-300">
               
+              {/* Hidden File Input for Avatar Upload */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleAvatarChange}
+                accept="image/*"
+                className="hidden"
+              />
+
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
-                {/* Left Column: Student Details Card & Account Settings */}
+                {/* Left Column: Student Summary Card with Photo Change Feature */}
                 <div className="lg:col-span-4 space-y-6">
                   
-                  {/* Profile Card (Without Picture as per prompt) */}
+                  {/* Profile Summary Card */}
                   <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 text-center space-y-4 shadow-xs">
+                    
+                    {/* Interactive Profile Photo Container */}
+                    <div className="relative w-28 h-28 mx-auto group cursor-pointer" onClick={() => fileInputRef.current?.click()} title="Click to change profile photo">
+                      <img
+                        src={avatarSrc}
+                        alt={profileData.fullName}
+                        className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:opacity-80 transition-opacity"
+                      />
+                      <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                        <Camera className="w-6 h-6 mb-1" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider">Change</span>
+                      </div>
+                      <div className="absolute bottom-0 right-0 bg-[#D4AF37] text-[#1B3B2B] p-1.5 rounded-full shadow-md border-2 border-white">
+                        <Camera className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
                     <div className="space-y-1.5">
                       <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">{profileData.fullName}</h3>
                       <span className="inline-block px-3 py-1 rounded-full bg-white border border-[#1B3B2B]/15 text-[#1B3B2B] text-[11px] font-bold">
@@ -793,231 +842,215 @@ export function StudentDashboardPage() {
             </div>
           )}
 
-          {/* TAB 3: RECORDED CLASSES (Screenshot 3 Exact Replica) */}
-          {activeTab === "recorded-classes" && (
-            <div className="space-y-8 animate-in fade-in duration-300">
+          {/* TAB 3: MY COURSES (Screenshot 1 Exact Replica) */}
+          {activeTab === "courses" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
               
-              {/* Header Title */}
-              <div className="space-y-1">
-                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Recorded Classes</h2>
-              </div>
-
-              {/* Main Featured Video Player & Chapters Section */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                 
-                {/* Left Video Player Container (8 Cols matching Screenshot 3) */}
-                <div className="lg:col-span-8 space-y-4">
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#1B3B2B]/15 bg-black group">
-                    <img
-                      src="https://images.unsplash.com/photo-1577896851231-70ef18881754?w=1000&auto=format&fit=crop&q=80"
-                      alt="Lecture Video Player"
-                      className="w-full h-[280px] sm:h-[380px] object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center">
-                      <button
-                        type="button"
-                        onClick={() => alert("Playing lecture video: Rules of Noon Sakinah")}
-                        className="w-16 h-16 rounded-full bg-[#D4AF37] text-[#1B3B2B] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform cursor-pointer"
-                      >
-                        <Play className="w-8 h-8 fill-[#1B3B2B] ml-1" />
-                      </button>
-                    </div>
+                {/* Left Column: Enrolled Subjects Cards List (5 Cols matching Screenshot 1) */}
+                <div className="lg:col-span-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#1B3B2B]/10 pb-3">
+                    <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">Enrolled Subjects</h3>
+                    <span className="text-xs text-muted-foreground font-semibold">3 Active</span>
                   </div>
 
-                  {/* Video Meta Info */}
-                  <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3 text-xs">
-                          <span className="px-3 py-1 rounded-full bg-white border border-[#1B3B2B]/20 text-[#1B3B2B] font-bold text-[10px] uppercase">
-                            TAJWEED
-                          </span>
-                          <span className="text-muted-foreground">Oct 24, 2023 • Shaykh Ali</span>
-                        </div>
-                        <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">
-                          Rules of Noon Sakinah
-                        </h3>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setIsCompleted(!isCompleted)}
-                        className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                          isCompleted
-                            ? "bg-emerald-700 text-white"
-                            : "bg-[#1B3B2B] text-white hover:bg-[#2B543D]"
-                        }`}
-                      >
-                        <Check className="w-4 h-4" /> {isCompleted ? "Completed" : "Mark as Completed"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Chapters Sidebar Container (4 Cols matching Screenshot 3) */}
-                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
-                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Chapters</h3>
-
-                  <div className="space-y-2.5 text-xs font-sans">
+                  <div className="space-y-4">
                     {[
-                      { id: 0, time: "00:00", title: "Introduction & Review" },
-                      { id: 1, time: "24:15", title: "Izhar (Clear Pronunciation)", desc: "Detailed explanation..." },
-                      { id: 2, time: "32:40", title: "Idgham (Assimilation)" },
-                      { id: 3, time: "45:10", title: "Iqlab & Ikhfa" },
-                      { id: 4, time: "52:00", title: "Q&A Session" },
-                    ].map((chap) => {
-                      const isActive = activeChapter === chap.id;
+                      {
+                        id: "tajweed-qirat",
+                        title: "Tajweed & Qirat",
+                        level: "ADVANCED",
+                        desc: "Mastering the phonetic rules and beautiful recitation styles of the Holy Quran.",
+                        progress: 65,
+                        icon: "📖"
+                      },
+                      {
+                        id: "hadith-studies",
+                        title: "Hadith Studies",
+                        level: "INTERMEDIATE",
+                        desc: "Comprehensive analysis of Sahih Al-Bukhari and principles of Hadith...",
+                        progress: 30,
+                        icon: "📜"
+                      },
+                      {
+                        id: "arabic-grammar",
+                        title: "Arabic Grammar",
+                        level: "BEGINNER",
+                        desc: "Foundational Nahw and Sarf for understanding classical texts.",
+                        progress: 15,
+                        icon: "🔤"
+                      }
+                    ].map((subject) => {
+                      const isSelected = selectedCourseId === subject.id;
                       return (
                         <div
-                          key={chap.id}
-                          onClick={() => setActiveChapter(chap.id)}
-                          className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
-                            isActive
-                              ? "bg-white border-[#1B3B2B]/20 shadow-xs"
-                              : "bg-transparent border-transparent hover:bg-white/60"
+                          key={subject.id}
+                          onClick={() => setSelectedCourseId(subject.id)}
+                          className={`p-6 rounded-2xl border transition-all cursor-pointer space-y-4 ${
+                            isSelected
+                              ? "bg-[#F5EFE6] border-2 border-[#D4AF37] shadow-sm"
+                              : "bg-[#F5EFE6]/60 border-[#1B3B2B]/10 hover:bg-[#F5EFE6]"
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            <span className={`font-mono text-xs font-bold ${isActive ? "text-[#1B3B2B]" : "text-[#D4AF37]"}`}>
-                              {chap.time}
-                            </span>
-                            <span className={`font-semibold ${isActive ? "text-[#1B3B2B] font-bold" : "text-[#1B3B2B]/80"}`}>
-                              {chap.title}
+                          <div className="flex items-center justify-between">
+                            <div className="w-10 h-10 rounded-xl bg-[#1B3B2B]/5 flex items-center justify-center text-xl">
+                              {subject.icon}
+                            </div>
+                            <span className="px-3 py-1 rounded-full bg-[#E5E7EB] text-[#374151] text-[10px] font-bold uppercase tracking-wider">
+                              {subject.level}
                             </span>
                           </div>
-                          {chap.desc && (
-                            <p className="text-[10px] text-muted-foreground mt-1 pl-12">{chap.desc}</p>
-                          )}
+
+                          <div>
+                            <h4 className="font-serif font-bold text-xl text-[#1B3B2B]">{subject.title}</h4>
+                            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{subject.desc}</p>
+                          </div>
+
+                          <div className="space-y-1.5 pt-1">
+                            <div className="flex justify-between text-xs font-semibold">
+                              <span className="text-muted-foreground">Progress</span>
+                              <span className="text-[#1B3B2B]">{subject.progress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className="bg-[#D4AF37] h-full rounded-full transition-all duration-500"
+                                style={{ width: `${subject.progress}%` }}
+                              />
+                            </div>
+                          </div>
                         </div>
                       );
                     })}
                   </div>
                 </div>
 
-              </div>
-
-              {/* Bottom Video Library Section */}
-              <div className="space-y-6 pt-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1B3B2B]/10 pb-4">
-                  <div>
-                    <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">Video Library</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">Explore past lectures and continue your learning journey.</p>
+                {/* Right Column: Course Detail & Syllabus Viewer (7 Cols matching Screenshot 1) */}
+                <div className="lg:col-span-7 space-y-6">
+                  
+                  {/* Hero Module Banner (Dark Green Card with Gold Accent) */}
+                  <div className="rounded-2xl bg-[#1B3B2B] text-white p-6 sm:p-8 shadow-xl border border-[#D4AF37]/30 space-y-4 relative overflow-hidden bg-[radial-gradient(#FED65B_1px,transparent_1px)] [background-size:16px_16px]">
+                    <div className="flex items-start justify-between gap-4 relative z-10">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#FED65B] block">
+                          MODULE 4 • SESSION 2
+                        </span>
+                        <h2 className="font-serif font-bold text-3xl sm:text-4xl text-white mt-1">
+                          Tajweed & Qirat
+                        </h2>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-white/70 uppercase block font-semibold">Current Progress</span>
+                        <span className="font-serif font-bold text-3xl text-[#FED65B]">65%</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs w-full sm:w-48">
-                      <Search className="w-3.5 h-3.5 text-muted-foreground" />
-                      <input
-                        type="text"
-                        placeholder="Search lectures..."
-                        className="bg-transparent focus:outline-none w-full text-xs"
+                  {/* Lead Instructor Card */}
+                  <div className="p-4 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80"
+                        alt="Shaykh Abdullah Al-Qari"
+                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-xs"
                       />
+                      <div>
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">LEAD INSTRUCTOR</span>
+                        <h4 className="font-serif font-bold text-base text-[#1B3B2B]">Shaykh Abdullah Al-Qari</h4>
+                      </div>
                     </div>
-                    <button type="button" className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-[#1B3B2B] flex items-center gap-1.5 hover:bg-gray-50">
-                      <SlidersHorizontal className="w-3.5 h-3.5" /> Subject
-                    </button>
-                    <button type="button" className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-[#1B3B2B] flex items-center gap-1.5 hover:bg-gray-50">
-                      <CalendarIcon className="w-3.5 h-3.5" /> Date
+                    <button
+                      type="button"
+                      onClick={() => alert("Opening message modal for Shaykh Abdullah Al-Qari")}
+                      className="p-2.5 rounded-xl bg-white border border-[#1B3B2B]/10 text-[#1B3B2B] hover:bg-gray-50"
+                      title="Contact Instructor"
+                    >
+                      <Mail className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
 
-                {/* 3-Column Video Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    {
-                      title: "Introduction to Sahih Al-Bukhari",
-                      desc: "An overview of the compilation methodology and historical context.",
-                      tag: "HADITH",
-                      timeAgo: "2 days ago",
-                      duration: "45:20",
-                      instructor: "Ustadh Umar",
-                      progress: 100,
-                      img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80"
-                    },
-                    {
-                      title: "Advanced Grammar: Nahw Patterns",
-                      desc: "Deep dive into complex sentence structures and grammatical states.",
-                      tag: "ARABIC",
-                      timeAgo: "1 week ago",
-                      duration: "58:15",
-                      instructor: "Shaykh Salih",
-                      progress: 45,
-                      img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&auto=format&fit=crop&q=80"
-                    },
-                    {
-                      title: "Principles of Jurisprudence (Usool)",
-                      desc: "Understanding the foundational texts and how rulings are derived.",
-                      tag: "FIQH",
-                      timeAgo: "2 weeks ago",
-                      duration: "1:12:05",
-                      instructor: "Mufti Ahmad",
-                      progress: 0,
-                      img: "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?w=600&auto=format&fit=crop&q=80"
-                    },
-                  ].map((video, i) => (
-                    <div key={i} className="rounded-2xl bg-white border border-[#1B3B2B]/10 overflow-hidden shadow-xs space-y-4 hover:shadow-md transition-all flex flex-col justify-between">
-                      <div className="space-y-3">
-                        <div className="relative h-44 bg-black overflow-hidden group cursor-pointer">
-                          <img src={video.img} alt={video.title} className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-300" />
-                          <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[10px] font-mono text-white">
-                            {video.duration}
-                          </span>
-                        </div>
+                  {/* Course Syllabus Container */}
+                  <div className="p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
+                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Course Syllabus</h3>
 
-                        <div className="px-5 space-y-2">
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className="px-2.5 py-0.5 rounded-full bg-[#F5EFE6] font-bold text-[#1B3B2B]">
-                              {video.tag}
-                            </span>
-                            <span className="text-muted-foreground">{video.timeAgo}</span>
-                          </div>
-                          <h4 className="font-serif font-bold text-base text-[#1B3B2B] leading-snug">{video.title}</h4>
-                          <p className="text-xs text-muted-foreground line-clamp-2">{video.desc}</p>
+                    <div className="space-y-4 text-xs font-sans">
+                      {/* Module 1 Completed */}
+                      <div className="p-4 rounded-xl bg-white/70 border border-gray-200 flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-emerald-700 shrink-0" />
+                        <div>
+                          <h5 className="font-bold text-[#1B3B2B]">Module 1: Foundations of Makharij</h5>
+                          <p className="text-[11px] text-muted-foreground">Articulation points of Arabic letters.</p>
                         </div>
                       </div>
 
-                      <div className="px-5 pb-5 pt-2 space-y-3 border-t border-gray-100">
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-[#1B3B2B]/10 flex items-center justify-center font-bold text-[10px] text-[#1B3B2B]">
-                              {video.instructor[0]}
-                            </div>
-                            <span className="font-semibold text-[#1B3B2B] text-xs">{video.instructor}</span>
-                          </div>
-                          <span className="font-mono text-xs font-bold text-[#1B3B2B]">{video.progress}%</span>
+                      {/* Module 2 Completed */}
+                      <div className="p-4 rounded-xl bg-white/70 border border-gray-200 flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-emerald-700 shrink-0" />
+                        <div>
+                          <h5 className="font-bold text-[#1B3B2B]">Module 2: Sifat Al-Huruf (Attributes)</h5>
+                          <p className="text-[11px] text-muted-foreground">Inherent and conditional characteristics of letters.</p>
                         </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                          <div className="bg-[#1B3B2B] h-full rounded-full" style={{ width: `${video.progress}%` }} />
+                      </div>
+
+                      {/* Module 3 Current Active */}
+                      <div className="p-5 rounded-2xl bg-white border-2 border-[#D4AF37] shadow-sm space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                            <Play className="w-3.5 h-3.5 fill-amber-800" />
+                          </div>
+                          <div>
+                            <span className="text-[9px] font-bold text-[#D4AF37] uppercase tracking-wider block">CURRENT MODULE</span>
+                            <h5 className="font-bold text-[#1B3B2B] text-sm">Module 3: Rules of Noon Sakinah & Tanween</h5>
+                            <p className="text-[11px] text-muted-foreground">Understanding Izhar, Idgham, Iqlab, and Ikhfa.</p>
+                          </div>
+                        </div>
+
+                        {/* Lessons List Inside Current Module */}
+                        <div className="pl-9 space-y-2 text-xs border-t border-gray-100 pt-3">
+                          <div className="flex items-center justify-between text-gray-500">
+                            <span className="flex items-center gap-2">
+                              <Check className="w-3.5 h-3.5 text-emerald-600" /> Introduction to Noon Sakinah
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between font-bold text-[#1B3B2B] bg-[#F5EFE6]/60 p-2 rounded-lg">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-[#1B3B2B]" /> Izhar (Clear Pronunciation)
+                            </span>
+                            <span className="font-mono text-[10px]">15:00</span>
+                          </div>
+                          <div className="flex items-center justify-between text-gray-400">
+                            <span className="flex items-center gap-2">
+                              <Lock className="w-3.5 h-3.5" /> Idgham (Assimilation)
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Module 4 Locked */}
+                      <div className="p-4 rounded-xl bg-white/40 border border-gray-200 flex items-center gap-3 text-gray-400">
+                        <Lock className="w-5 h-5 shrink-0" />
+                        <div>
+                          <h5 className="font-semibold">Module 4: Mudood (Elongation Rules)</h5>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
 
-                {/* Pagination Controls */}
-                <div className="flex items-center justify-center gap-2 pt-4">
-                  <button type="button" onClick={() => setRecordedPage(Math.max(1, recordedPage - 1))} className="p-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-[#1B3B2B] hover:bg-gray-50">
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  {[1, 2, 3].map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setRecordedPage(p)}
-                      className={`w-9 h-9 rounded-xl text-xs font-bold ${
-                        recordedPage === p
-                          ? "bg-[#1B3B2B] text-white"
-                          : "bg-white border border-gray-200 text-[#1B3B2B] hover:bg-gray-50"
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                  <span className="text-xs text-muted-foreground">...</span>
-                  <button type="button" onClick={() => setRecordedPage(recordedPage + 1)} className="p-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-[#1B3B2B] hover:bg-gray-50">
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                    {/* Bottom Action Footer */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#1B3B2B]/10">
+                      <span className="text-xs text-muted-foreground font-semibold flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-[#1B3B2B]" /> Est. time left: 4h 30m
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => alert("Resuming Tajweed & Qirat Module 3...")}
+                        className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#D4AF37] text-[#1B3B2B] font-bold text-xs hover:bg-[#e9c349] transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        Resume Course →
+                      </button>
+                    </div>
+
+                  </div>
+
                 </div>
 
               </div>
@@ -1025,549 +1058,493 @@ export function StudentDashboardPage() {
             </div>
           )}
 
-          {/* TAB 4: ATTENDANCE (Screenshot 1 Exact Replica) */}
-          {activeTab === "attendance" && (
+          {/* TAB 4: DIGITAL LIBRARY (Screenshot 2 Exact Replica) */}
+          {activeTab === "library" && (
             <div className="space-y-6 animate-in fade-in duration-300">
               
               <div className="space-y-1">
-                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Attendance</h2>
+                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Digital Library</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Access our curated collection of reference books, study materials, and daily spiritual readings.
+                </p>
               </div>
 
-              {/* 4 Summary Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
-                  <div className="w-10 h-10 rounded-xl bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
-                    <BookOpen className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">CONDUCTED CLASSES</span>
-                    <p className="font-serif font-bold text-4xl text-[#1B3B2B] mt-1">120</p>
-                  </div>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
-                    <Check className="w-5 h-5 stroke-[3]" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">PRESENT</span>
-                    <p className="font-serif font-bold text-4xl text-[#1B3B2B] mt-1">112</p>
-                  </div>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
-                  <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
-                    <X className="w-5 h-5 stroke-[3]" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">ABSENT</span>
-                    <p className="font-serif font-bold text-4xl text-rose-700 mt-1">5</p>
-                  </div>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-[#1B3B2B] text-white space-y-4 shadow-md border border-[#D4AF37]/30">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#FED65B]">
-                    <TrendingUp className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FED65B] block">ATTENDANCE %</span>
-                    <p className="font-serif font-bold text-4xl text-[#FED65B] mt-1">94%</p>
-                  </div>
-                </div>
+              {/* Filter Tabs / Pills */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                {["All Files", "Reference Books", "Daily Duas", "Tafseer Kitabs", "Hadith Studies"].map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setLibraryCategory(cat)}
+                    className={`px-5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                      libraryCategory === cat
+                        ? "bg-[#1B3B2B] text-white shadow-sm"
+                        : "bg-white border border-gray-200 text-[#1B3B2B] hover:bg-[#F5EFE6]"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
 
-              {/* Bottom Split Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-                <div className="lg:col-span-5 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">{calendarMonth}</h3>
-                    <div className="flex items-center gap-1">
-                      <button type="button" onClick={() => setCalendarMonth("September 2023")} className="p-1 text-[#1B3B2B] hover:bg-[#1B3B2B]/10 rounded-lg">
-                        <ChevronLeft className="w-5 h-5" />
+              {/* Cards Grid (3 Columns matching Screenshot 2) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  {
+                    title: "Principles of Islamic Jurisprudence",
+                    subtitle: "Advanced Fiqh Studies",
+                    category: "REFERENCE",
+                    categoryBadgeClass: "bg-[#EFE9DD] text-[#4A4237]",
+                    iconBg: "bg-rose-100 text-rose-600",
+                    iconType: "pdf",
+                    size: "4.2 MB",
+                    date: "Oct 12, 2023",
+                    desc: "Comprehensive manual on Usul al-Fiqh, legal deduction, and sharia ruling methodologies."
+                  },
+                  {
+                    title: "Morning & Evening Supplications",
+                    subtitle: "Essential Adhkar from the Sunnah",
+                    category: "DAILY DUAS",
+                    categoryBadgeClass: "bg-[#FEF3C7] text-[#92400E]",
+                    iconBg: "bg-amber-100 text-amber-800",
+                    iconType: "book",
+                    size: "1.8 MB",
+                    date: "Nov 05, 2023",
+                    desc: "Authentic daily morning and evening adhkar, protection prayers, and prophetic supplications."
+                  },
+                  {
+                    title: "History of the Prophets",
+                    subtitle: "Detailed biographical accounts",
+                    category: "REFERENCE",
+                    categoryBadgeClass: "bg-[#EFE9DD] text-[#4A4237]",
+                    iconBg: "bg-rose-100 text-rose-600",
+                    iconType: "pdf",
+                    size: "8.5 MB",
+                    date: "Dec 20, 2023",
+                    desc: "Chronological accounts of the Prophets of Allah from Adam (AS) to Prophet Muhammad ﷺ."
+                  },
+                ]
+                  .filter((b) => {
+                    if (libraryCategory === "All Files") return true;
+                    if (libraryCategory === "Reference Books" && b.category === "REFERENCE") return true;
+                    if (libraryCategory === "Daily Duas" && b.category === "DAILY DUAS") return true;
+                    return true;
+                  })
+                  .map((item, idx) => (
+                    <div key={idx} className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 shadow-xs flex flex-col justify-between space-y-5 hover:shadow-md transition-all">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${item.iconBg}`}>
+                            {item.iconType === "pdf" ? <span className="text-xs font-bold font-mono">PDF</span> : <Library className="w-5 h-5" />}
+                          </div>
+                          <span className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${item.categoryBadgeClass}`}>
+                            {item.category}
+                          </span>
+                        </div>
+
+                        <div>
+                          <h3 className="font-serif font-bold text-xl text-[#1B3B2B] leading-tight">{item.title}</h3>
+                          <p className="text-xs text-muted-foreground mt-1">{item.subtitle}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 pt-2 border-t border-[#1B3B2B]/10">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground font-sans">
+                          <span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> {item.size}</span>
+                          <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {item.date}</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <button type="button" onClick={() => setPreviewBook(item)} className="w-full flex items-center justify-center gap-2 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] py-2.5 text-xs font-semibold hover:bg-[#1B3B2B]/5 cursor-pointer">
+                            <Eye className="w-4 h-4" /> Preview
+                          </button>
+                          <a href="#" onClick={(e) => { e.preventDefault(); alert(`Downloading "${item.title}"`); }} className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1B3B2B] text-white py-2.5 text-xs font-semibold hover:bg-[#2B543D] cursor-pointer">
+                            <Download className="w-4 h-4 text-[#FED65B]" /> Download
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Book Preview Modal */}
+              {previewBook && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                  <div className="bg-[#F5EFE6] w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl border border-[#1B3B2B]/20 animate-in zoom-in-95">
+                    <div className="flex items-center justify-between border-b border-[#1B3B2B]/10 pb-3">
+                      <div>
+                        <span className="text-[10px] font-bold text-[#D4AF37] uppercase">{previewBook.category}</span>
+                        <h4 className="font-serif text-xl font-bold text-[#1B3B2B]">{previewBook.title}</h4>
+                      </div>
+                      <button type="button" onClick={() => setPreviewBook(null)} className="p-1 hover:bg-[#1B3B2B]/10 rounded-lg">
+                        <X className="w-5 h-5 text-[#1B3B2B]" />
                       </button>
-                      <button type="button" onClick={() => setCalendarMonth("October 2023")} className="p-1 text-[#1B3B2B] hover:bg-[#1B3B2B]/10 rounded-lg">
-                        <ChevronRight className="w-5 h-5" />
+                    </div>
+                    <p className="text-xs text-[#1B3B2B]/80 leading-relaxed">{previewBook.desc}</p>
+                    <div className="flex gap-3 pt-2">
+                      <button type="button" onClick={() => { alert(`Opening reader for ${previewBook.title}`); setPreviewBook(null); }} className="flex-1 bg-[#1B3B2B] text-white py-2.5 rounded-xl text-xs font-bold hover:bg-[#2B543D]">
+                        Open Reader →
+                      </button>
+                      <button type="button" onClick={() => setPreviewBook(null)} className="px-4 bg-white text-[#1B3B2B] py-2.5 rounded-xl text-xs font-semibold border border-[#1B3B2B]">
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* TAB 5: ASSIGNMENTS (Screenshot 3 Exact Replica) */}
+          {activeTab === "assignments" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              
+              <div className="space-y-4 border-b border-[#1B3B2B]/10 pb-3">
+                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Assignments</h2>
+
+                <div className="flex gap-8 text-sm font-semibold">
+                  {["pending", "submitted", "graded"].map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setAssignmentSubTab(tab as any)}
+                      className={`pb-2 capitalize transition-all cursor-pointer ${assignmentSubTab === tab ? "text-[#1B3B2B] font-bold border-b-2 border-[#1B3B2B]" : "text-muted-foreground"}`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                {/* Left List (5 Cols) */}
+                <div className="lg:col-span-5 space-y-4">
+                  {[
+                    { id: "fiqh-101", title: "Fiqh al-Ibadat: Purification", course: "Islamic Jurisprudence 101", due: "Oct 25", marks: "50 Marks", status: "PENDING", badgeClass: "bg-rose-100 text-rose-700" },
+                    { id: "tafsir-201", title: "Tafsir Surah Al-Fatiha", course: "Quranic Exegesis", due: "Oct 28", marks: "100 Marks", status: "PENDING", badgeClass: "bg-rose-100 text-rose-700" },
+                  ].map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => setSelectedAssignmentId(item.id)}
+                      className={`p-5 rounded-2xl border transition-all cursor-pointer space-y-3 ${selectedAssignmentId === item.id ? "bg-[#F5EFE6] border-[#1B3B2B] ring-1 ring-[#1B3B2B]" : "bg-[#F5EFE6]/60 border-[#1B3B2B]/10"}`}
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.badgeClass}`}>{item.status}</span>
+                        <span className="text-muted-foreground font-medium">Due: {item.due}</span>
+                      </div>
+                      <h3 className="font-serif font-bold text-lg text-[#1B3B2B]">{item.title}</h3>
+                      <p className="text-xs text-muted-foreground">{item.course}</p>
+                      <div className="flex items-center gap-1.5 text-xs text-[#1B3B2B] font-semibold">
+                        <Star className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" /> {item.marks}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Right Detail Panel (7 Cols) */}
+                <div className="lg:col-span-7">
+                  <div className="p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-6 shadow-xs">
+                    <div className="space-y-2 border-b border-[#1B3B2B]/10 pb-4">
+                      <h2 className="font-serif font-bold text-2xl text-[#1B3B2B]">Fiqh al-Ibadat: Purification</h2>
+                      <p className="text-xs font-semibold text-[#1B3B2B]">📖 Islamic Jurisprudence 101 • <span className="text-rose-700">Due: Oct 25, 11:59 PM</span></p>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-[#1B3B2B]/80 leading-relaxed font-sans">
+                      Please write a comprehensive essay (1500 words) detailing the conditions and pillars of Wudu (ablution) according to the Hanafi school of thought. Include evidences from the Quran and Sunnah.
+                    </p>
+
+                    <div className="space-y-2">
+                      <h3 className="font-serif font-bold text-lg text-[#1B3B2B]">Instructions:</h3>
+                      <ul className="list-disc list-inside text-xs sm:text-sm text-[#1B3B2B]/80 space-y-1 pl-1">
+                        <li>Format as PDF or DOCX.</li>
+                        <li>Use standard academic referencing.</li>
+                        <li>Ensure clarity and proper structuring.</li>
+                      </ul>
+                    </div>
+
+                    <div className="p-6 rounded-2xl bg-white border border-[#1B3B2B]/10 space-y-4">
+                      <h3 className="font-serif font-bold text-lg text-[#1B3B2B] flex items-center gap-2">
+                        <UploadCloud className="w-5 h-5 text-[#1B3B2B]" /> Submit Assignment
+                      </h3>
+                      <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center bg-[#FDFBF7]">
+                        <UploadCloud className="w-6 h-6 mx-auto text-[#1B3B2B]" />
+                        <p className="text-xs font-semibold text-[#1B3B2B] mt-2">
+                          {assignmentFile ? assignmentFile.name : "Drag and drop your file here, or click to browse"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-1">Supported formats: PDF, DOCX (Max 10MB)</p>
+                        <input type="file" onChange={(e) => e.target.files?.[0] && setAssignmentFile(e.target.files[0])} className="hidden" id="asgn-file" />
+                        <label htmlFor="asgn-file" className="inline-block mt-3 px-4 py-1.5 rounded-lg bg-[#F5EFE6] text-xs font-bold border cursor-pointer">Choose File</label>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-xs font-semibold text-[#1B3B2B]">Comments for Teacher (Optional)</label>
+                        <textarea rows={3} placeholder="Add any notes about your submission here..." value={assignmentNotes} onChange={(e) => setAssignmentNotes(e.target.value)} className="w-full p-3 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#1B3B2B]/20 bg-white" />
+                      </div>
+
+                      <div className="flex justify-end gap-3">
+                        <button type="button" onClick={() => alert("Draft saved!")} className="px-5 py-2.5 rounded-xl bg-white border border-[#1B3B2B] text-xs font-semibold">Save Draft</button>
+                        <button type="button" onClick={() => alert("Submitted assignment!")} className="px-6 py-2.5 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold">Submit Assignment</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 6: ONLINE TESTS */}
+          {activeTab === "tests" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="border-b border-[#1B3B2B]/10 pb-4">
+                <h3 className="font-serif text-2xl font-bold text-[#1B3B2B]">Online Examinations & Quizzes</h3>
+                <p className="text-xs text-muted-foreground">Take scheduled multiple choice assessments and check instantly scored results.</p>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/15 space-y-4">
+                <h4 className="font-serif text-xl font-bold text-[#1B3B2B]">Tajweed Makharij & Sifat Online Quiz</h4>
+                <p className="text-xs text-muted-foreground">20 Multiple choice questions • 30 Minutes Duration • Passing Marks: 70%</p>
+
+                {!activeQuizModal ? (
+                  <button type="button" onClick={() => setActiveQuizModal(true)} className="rounded-xl bg-[#1B3B2B] text-white px-6 py-2.5 text-xs font-bold">Start Quiz Now →</button>
+                ) : (
+                  <div className="p-5 rounded-xl bg-white border border-[#1B3B2B]/20 space-y-4">
+                    <h5 className="font-bold text-sm text-[#1B3B2B]">Question 1 of 5: What is the primary Makhraj of letter 'Qaf' (ق)?</h5>
+                    <div className="space-y-2 text-xs">
+                      {["A. Deepest root of tongue against soft palate", "B. Tip of tongue against front upper teeth", "C. Both lips pressed together", "D. Throat cavity"].map((opt, idx) => (
+                        <label key={idx} className="flex items-center gap-3 p-2.5 rounded-xl bg-[#F5EFE6] border border-[#1B3B2B]/10 cursor-pointer">
+                          <input type="radio" name="q1" checked={quizAnswers[1] === idx} onChange={() => setQuizAnswers({ ...quizAnswers, 1: idx })} />
+                          <span>{opt}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <button type="button" onClick={() => setQuizSubmitted(true)} className="rounded-xl bg-[#D4AF37] text-[#1B3B2B] px-5 py-2 text-xs font-bold">Submit Answers →</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: LIVE CLASSES */}
+          {activeTab === "live-classes" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                <div className="lg:col-span-8 space-y-6">
+                  <div className="rounded-2xl overflow-hidden border border-[#1B3B2B]/20 shadow-lg">
+                    <div className="bg-[#1B3B2B] text-white p-8 space-y-6">
+                      <span className="inline-block px-3 py-1 rounded-md bg-[#D4AF37]/20 border border-[#D4AF37] text-[#FED65B] text-[10px] font-bold uppercase tracking-widest">
+                        LIVE NOW
+                      </span>
+                      <h2 className="font-serif font-bold text-3xl sm:text-4xl text-white">Advanced Fiqh Studies</h2>
+                      <p className="text-xs sm:text-sm text-white/80">Shaykh Abdullah Al-Mahmoud</p>
+                    </div>
+
+                    <div className="bg-[#F5EFE6] p-6 sm:p-8 space-y-6 text-xs sm:text-sm text-[#1B3B2B]">
+                      <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground font-semibold">
+                        <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-[#1B3B2B]" /> 06:00 PM - 07:30 PM (IST)</span>
+                        <span className="flex items-center gap-2"><User className="w-4 h-4 text-[#1B3B2B]" /> 142 Students Joined</span>
+                      </div>
+                      <p className="text-[#1B3B2B]/80 leading-relaxed text-xs sm:text-sm">
+                        Today's session focuses on the principles of Islamic jurisprudence regarding contemporary financial transactions, exploring historical contexts and modern applications.
+                      </p>
+                      <a href="https://zoom.us" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#D4AF37] text-[#1B3B2B] font-bold text-xs uppercase tracking-wider shadow-sm">
+                        <Video className="w-4 h-4" /> Join Live Class
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-6 shadow-xs">
+                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">ℹ Class Etiquette</h3>
+                  <div className="space-y-4 text-xs">
+                    <div className="space-y-1">
+                      <div className="font-bold text-[#1B3B2B]">🎙 Microphone Muted</div>
+                      <p className="text-muted-foreground">Please keep your microphone muted unless asked to speak.</p>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-bold text-[#1B3B2B]">📹 Camera Optional</div>
+                      <p className="text-muted-foreground">Camera on is encouraged for interaction, but not mandatory.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 8: RECORDED CLASSES */}
+          {activeTab === "recorded-classes" && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div className="space-y-1">
+                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Recorded Classes</h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                <div className="lg:col-span-8 space-y-4">
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#1B3B2B]/15 bg-black group">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?w=1000&auto=format&fit=crop&q=80" alt="Video Player" className="w-full h-[280px] sm:h-[380px] object-cover opacity-90" />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <button type="button" onClick={() => alert("Playing lecture video...")} className="w-16 h-16 rounded-full bg-[#D4AF37] text-[#1B3B2B] flex items-center justify-center shadow-2xl">
+                        <Play className="w-8 h-8 fill-[#1B3B2B] ml-1" />
                       </button>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-muted-foreground">
-                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold">
-                    <span className="p-2"></span>
-                    <span className="p-2 text-gray-700">1</span>
-                    {[2, 3, 4, 5].map((d) => (
-                      <span key={d} className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">
-                        {d}
-                      </span>
-                    ))}
-                    <span className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center mx-auto">6</span>
-                    {[7, 8].map((d) => (<span key={d} className="p-2 text-gray-700">{d}</span>))}
-                    {[9, 10].map((d) => (
-                      <span key={d} className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">
-                        {d}
-                      </span>
-                    ))}
-                    <span className="w-8 h-8 rounded-full bg-[#D4AF37] text-[#1B3B2B] font-bold flex items-center justify-center mx-auto">11</span>
-                    <span className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">12</span>
-                    <span className="w-8 h-8 rounded-full bg-[#36493F] text-white flex items-center justify-center mx-auto">13</span>
-                    <span className="p-2 text-gray-700">14</span>
-                    <span className="p-2 text-gray-700">15</span>
-                    <span className="w-8 h-8 rounded-full bg-[#D4AF37] text-[#1B3B2B] font-bold flex items-center justify-center mx-auto ring-2 ring-[#1B3B2B]">16</span>
-                    {[17, 18, 19, 20, 21].map((d) => (<span key={d} className="p-2 text-gray-400">{d}</span>))}
-                  </div>
-
-                  <div className="pt-4 border-t border-[#1B3B2B]/10 flex items-center justify-start gap-6 text-xs text-muted-foreground font-medium">
-                    <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#36493F]" /> Present</span>
-                    <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-rose-500" /> Absent</span>
-                    <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" /> Excused</span>
+                  <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <span className="px-3 py-1 rounded-full bg-white border text-[#1B3B2B] font-bold text-[10px]">TAJWEED</span>
+                        <h3 className="font-serif font-bold text-2xl text-[#1B3B2B] mt-2">Rules of Noon Sakinah</h3>
+                      </div>
+                      <button type="button" onClick={() => setIsCompleted(!isCompleted)} className="px-5 py-2.5 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold">
+                        {isCompleted ? "Completed" : "Mark as Completed"}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="lg:col-span-7 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Attendance Log</h3>
-                    <button type="button" onClick={() => alert("Exporting log...")} className="flex items-center gap-1.5 text-xs font-semibold text-[#1B3B2B] hover:underline">
-                      <Download className="w-3.5 h-3.5" /> Export
-                    </button>
+                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5">
+                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Chapters</h3>
+                  <div className="space-y-2 text-xs">
+                    {[{ time: "00:00", title: "Introduction & Review" }, { time: "24:15", title: "Izhar (Clear Pronunciation)" }, { time: "32:40", title: "Idgham (Assimilation)" }].map((c, i) => (
+                      <div key={i} className="p-3 rounded-xl bg-white border text-[#1B3B2B] font-semibold">{c.time} • {c.title}</div>
+                    ))}
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
 
+          {/* TAB 9: ATTENDANCE */}
+          {activeTab === "attendance" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Attendance</h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-2">
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground">CONDUCTED CLASSES</span>
+                  <p className="font-serif font-bold text-4xl text-[#1B3B2B]">120</p>
+                </div>
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-2">
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground">PRESENT</span>
+                  <p className="font-serif font-bold text-4xl text-[#1B3B2B]">112</p>
+                </div>
+                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-2">
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground">ABSENT</span>
+                  <p className="font-serif font-bold text-4xl text-rose-700">5</p>
+                </div>
+                <div className="p-6 rounded-2xl bg-[#1B3B2B] text-white space-y-2 border border-[#D4AF37]/30">
+                  <span className="text-[10px] font-bold uppercase text-[#FED65B]">ATTENDANCE %</span>
+                  <p className="font-serif font-bold text-4xl text-[#FED65B]">94%</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                <div className="lg:col-span-5 p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
+                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">October 2023</h3>
+                  <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold">
+                    {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                      <span key={d} className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto ${d === 6 ? "bg-rose-500 text-white" : d === 11 ? "bg-[#D4AF37] text-[#1B3B2B]" : "bg-[#36493F] text-white"}`}>{d}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="lg:col-span-7 p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
+                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Attendance Log</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs text-left">
                       <thead>
-                        <tr className="border-b border-[#1B3B2B]/10 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
+                        <tr className="border-b text-muted-foreground font-bold uppercase text-[10px]">
                           <th className="py-3">DATE</th>
                           <th className="py-3">SUBJECT</th>
                           <th className="py-3">TEACHER</th>
                           <th className="py-3 text-right">STATUS</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#1B3B2B]/10">
-                        {[
-                          { date: "Oct 16, 2023", subject: "Islamic History", teacher: "Sheikh Abdullah", status: "Present", badge: "bg-emerald-100 text-emerald-800" },
-                          { date: "Oct 13, 2023", subject: "Quranic Studies", teacher: "Ustadh Rahman", status: "Present", badge: "bg-emerald-100 text-emerald-800" },
-                          { date: "Oct 11, 2023", subject: "Arabic Grammar", teacher: "Ustadh Rahman", status: "Excused", badge: "bg-amber-100 text-amber-800" },
-                          { date: "Oct 06, 2023", subject: "Hadith", teacher: "Sheikh Abdullah", status: "Absent", badge: "bg-rose-100 text-rose-700" },
-                          { date: "Oct 05, 2023", subject: "Islamic History", teacher: "Sheikh Abdullah", status: "Present", badge: "bg-emerald-100 text-emerald-800" },
-                        ].map((row, idx) => (
-                          <tr key={idx} className="hover:bg-[#1B3B2B]/5 transition-colors">
-                            <td className="py-3.5 font-medium text-[#1B3B2B]">{row.date}</td>
-                            <td className="py-3.5 font-bold text-[#1B3B2B]">{row.subject}</td>
-                            <td className="py-3.5 text-muted-foreground">{row.teacher}</td>
-                            <td className="py-3.5 text-right">
-                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.badge}`}>{row.status}</span>
-                            </td>
+                      <tbody className="divide-y">
+                        {[{ date: "Oct 16, 2023", subject: "Islamic History", teacher: "Sheikh Abdullah", status: "Present" }, { date: "Oct 13, 2023", subject: "Quranic Studies", teacher: "Ustadh Rahman", status: "Present" }].map((r, i) => (
+                          <tr key={i}>
+                            <td className="py-3 font-medium">{r.date}</td>
+                            <td className="py-3 font-bold">{r.subject}</td>
+                            <td className="py-3 text-muted-foreground">{r.teacher}</td>
+                            <td className="py-3 text-right"><span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">{r.status}</span></td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-
-                  <div className="pt-2 text-center">
-                    <button type="button" onClick={() => alert("Loading older logs...")} className="text-xs font-semibold text-[#1B3B2B] hover:underline">
-                      View Older Logs
-                    </button>
-                  </div>
                 </div>
               </div>
-
             </div>
           )}
 
-          {/* TAB 5: PROGRESS REPORT (Screenshot 2 Exact Replica) */}
+          {/* TAB 10: PROGRESS REPORT */}
           {activeTab === "report" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1B3B2B]/10 pb-4">
                 <div>
                   <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Academic Progress</h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Term 1: Fall 2023 - Overall Performance</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Term 1: Fall 2023 - Overall Performance</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => alert("Generating & Downloading Official PDF Report Card...")}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold hover:bg-[#e9c349] transition-colors shadow-xs cursor-pointer"
-                >
+                <button type="button" onClick={() => alert("Downloading Report Card...")} className="px-5 py-2.5 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold flex items-center gap-2">
                   <Download className="w-4 h-4" /> Download Official Report Card (PDF)
                 </button>
               </div>
 
-              {/* Grade Trends & Term Summary */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                <div className="lg:col-span-8 p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 flex flex-col justify-between shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Grade Trends</h3>
-                    <span className="px-3 py-1 rounded-full bg-[#E8E0D2] text-[#1B3B2B] text-[10px] font-bold uppercase tracking-wider">
-                      TERM 1
-                    </span>
-                  </div>
-
-                  <div className="w-full pt-4 pb-2">
-                    <svg viewBox="0 0 500 180" className="w-full h-44 overflow-visible">
-                      {[0, 30, 60, 90, 120, 150].map((y, idx) => (
-                        <line key={idx} x1="30" y1={y + 10} x2="480" y2={y + 10} stroke="#1B3B2B" strokeOpacity="0.08" strokeDasharray="4 4" />
-                      ))}
-                      <text x="5" y="15" fill="#71717A" fontSize="9" className="font-mono">100</text>
-                      <text x="5" y="45" fill="#71717A" fontSize="9" className="font-mono">95</text>
-                      <text x="5" y="75" fill="#71717A" fontSize="9" className="font-mono">90</text>
-                      <text x="5" y="105" fill="#71717A" fontSize="9" className="font-mono">85</text>
-                      <text x="5" y="135" fill="#71717A" fontSize="9" className="font-mono">80</text>
-                      <text x="5" y="165" fill="#71717A" fontSize="9" className="font-mono">60</text>
-
-                      <path d="M 50 100 Q 120 75 190 90 T 330 65 T 470 70 L 470 160 L 50 160 Z" fill="#36493F" fillOpacity="0.12" />
-                      <path d="M 50 100 Q 120 75 190 90 T 330 65 T 470 70" fill="none" stroke="#36493F" strokeWidth="3" />
-                      {[
-                        { x: 50, y: 100 }, { x: 120, y: 80 }, { x: 190, y: 90 }, { x: 260, y: 72 }, { x: 330, y: 82 }, { x: 400, y: 55 }, { x: 470, y: 68 }
-                      ].map((pt, i) => (
-                        <circle key={i} cx={pt.x} cy={pt.y} r="4" fill="#D4AF37" stroke="#36493F" strokeWidth="2" />
-                      ))}
-
-                      <text x="40" y="178" fill="#71717A" fontSize="9">Week 1</text>
-                      <text x="110" y="178" fill="#71717A" fontSize="9">Week 2</text>
-                      <text x="180" y="178" fill="#71717A" fontSize="9">Week 3</text>
-                      <text x="250" y="178" fill="#71717A" fontSize="9">Week 4</text>
-                      <text x="320" y="178" fill="#71717A" fontSize="9">Week 5</text>
-                      <text x="390" y="178" fill="#71717A" fontSize="9">Week 6</text>
-                      <text x="450" y="178" fill="#71717A" fontSize="9">Midterm</text>
-                    </svg>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+                <div className="lg:col-span-8 p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
+                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Grade Trends</h3>
+                  <div className="h-44 w-full flex items-center justify-center font-serif text-lg font-bold text-[#1B3B2B]">
+                    Average Grade: 91% (A+) Across Term Modules
                   </div>
                 </div>
-
-                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
+                <div className="lg:col-span-4 p-6 rounded-2xl bg-[#F5EFE6] border space-y-3">
                   <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Term Summary</h3>
-
-                  <div className="space-y-3 relative z-10">
-                    <div className="p-4 rounded-xl bg-white/80 border border-[#1B3B2B]/10 flex items-center justify-between">
-                      <div>
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block">OVERALL GPA</span>
-                        <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-0.5">3.8</p>
-                      </div>
-                      <ArrowUpRight className="w-5 h-5 text-[#1B3B2B]" />
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-white/80 border border-[#1B3B2B]/10 flex items-center justify-between">
-                      <div>
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block">ATTENDANCE</span>
-                        <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-0.5">95%</p>
-                      </div>
-                      <Check className="w-5 h-5 text-emerald-700 stroke-[3]" />
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-white/80 border border-[#1B3B2B]/10 flex items-center justify-between">
-                      <div>
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block">CLASS RANK</span>
-                        <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-0.5">4<span className="text-lg font-sans">th</span></p>
-                      </div>
-                      <TrendingUp className="w-5 h-5 text-[#D4AF37]" />
-                    </div>
-                  </div>
+                  <div className="p-3 bg-white rounded-xl border text-xs font-bold">OVERALL GPA: 3.8</div>
+                  <div className="p-3 bg-white rounded-xl border text-xs font-bold">ATTENDANCE: 95%</div>
+                  <div className="p-3 bg-white rounded-xl border text-xs font-bold">CLASS RANK: 4th</div>
                 </div>
               </div>
-
-              {/* Subject Breakdown Table */}
-              <div className="p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
-                <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Subject Breakdown</h3>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-left">
-                    <thead>
-                      <tr className="border-b border-[#1B3B2B]/10 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
-                        <th className="py-3">SUBJECT</th>
-                        <th className="py-3">QUIZ AVG</th>
-                        <th className="py-3">ASSIGNMENTS</th>
-                        <th className="py-3">MIDTERM EXAM</th>
-                        <th className="py-3">FINAL GRADE</th>
-                        <th className="py-3 text-right">STATUS</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#1B3B2B]/10">
-                      {[
-                        { subject: "Islamic History", icon: "📖", quiz: "92%", assignments: "95%", midterm: "88%", final: "91% (A)", status: "Excellent", badge: "bg-emerald-100 text-emerald-800" },
-                        { subject: "Arabic Grammar", icon: "🔤", quiz: "85%", assignments: "88%", midterm: "92%", final: "89% (B+)", status: "Good", badge: "bg-emerald-100 text-emerald-800" },
-                        { subject: "Quranic Studies", icon: "📖", quiz: "98%", assignments: "100%", midterm: "96%", final: "98% (A+)", status: "Outstanding", badge: "bg-amber-100 text-amber-800" },
-                        { subject: "Mathematics", icon: "📐", quiz: "78%", assignments: "82%", midterm: "75%", final: "79% (C+)", status: "Satisfactory", badge: "bg-gray-200 text-gray-700" },
-                      ].map((row, idx) => (
-                        <tr key={idx} className="hover:bg-[#1B3B2B]/5 transition-colors">
-                          <td className="py-4 font-bold text-[#1B3B2B] flex items-center gap-2">
-                            <span>{row.icon}</span> <span>{row.subject}</span>
-                          </td>
-                          <td className="py-4 text-[#1B3B2B] font-medium">{row.quiz}</td>
-                          <td className="py-4 text-[#1B3B2B] font-medium">{row.assignments}</td>
-                          <td className="py-4 text-[#1B3B2B] font-medium">{row.midterm}</td>
-                          <td className="py-4 font-bold text-[#1B3B2B]">{row.final}</td>
-                          <td className="py-4 text-right">
-                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${row.badge}`}>{row.status}</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Teacher's Remarks */}
-              <div className="p-6 sm:p-8 rounded-2xl bg-[#1B3B2B] text-white space-y-4 shadow-xl border border-[#D4AF37]/30 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="w-16 h-16 rounded-full border-2 border-[#D4AF37] overflow-hidden shrink-0 shadow-md">
-                  <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-                    alt="Teacher Advisor"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-serif text-lg font-bold text-[#FED65B] flex items-center gap-2">
-                    <span className="text-2xl">❝</span> Teacher's Remarks
-                  </h4>
-                  <p className="text-xs sm:text-sm text-white/90 italic leading-relaxed">
-                    "The student has shown exceptional dedication to Quranic Studies and Islamic History this term. Their participation in class discussions is insightful and inspiring to peers. While Mathematics remains an area for growth, consistent effort is evident. Continued focus on analytical problem-solving will yield great results."
-                  </p>
-                  <p className="text-xs font-semibold text-white/70 pt-1">
-                    <strong className="text-[#FED65B]">Ustadha Amina Rashid</strong> | Head Advisor
-                  </p>
-                </div>
-              </div>
-
             </div>
           )}
 
-          {/* TAB 6: FEE STATUS (Rupees ₹) */}
+          {/* TAB 11: FEE STATUS (Indian Rupees ₹) */}
           {activeTab === "fee" && (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="space-y-1">
                 <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Financial Overview</h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Review your fee status, payment history, and upcoming dues in Indian Rupees (₹).
-                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Review your fee status, payment history, and upcoming dues in Indian Rupees (₹).</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
-                  <div className="w-10 h-10 rounded-xl bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
-                    <Receipt className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">TOTAL FEE (ANNUAL)</span>
-                    <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-1">₹6,000.00</p>
-                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">TOTAL FEE (ANNUAL)</span>
+                  <p className="font-serif font-bold text-3xl text-[#1B3B2B] mt-1">₹6,000.00</p>
                 </div>
-
                 <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
-                    <Check className="w-5 h-5 stroke-[3]" />
-                  </div>
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">PAID AMOUNT</span>
-                    <p className="font-serif font-bold text-3xl text-[#1B3B2B]">₹4,500.00</p>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                      <div className="bg-[#1B3B2B] h-full rounded-full w-[75%]" />
-                    </div>
-                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">PAID AMOUNT</span>
+                  <p className="font-serif font-bold text-3xl text-[#1B3B2B]">₹4,500.00</p>
                 </div>
-
                 <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4 shadow-xs">
-                  <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
-                    <AlertTriangle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">DUE BALANCE</span>
-                    <p className="font-serif font-bold text-3xl text-rose-700 mt-1">₹1,500.00</p>
-                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">DUE BALANCE</span>
+                  <p className="font-serif font-bold text-3xl text-rose-700">₹1,500.00</p>
                 </div>
-
-                <div className="p-6 rounded-2xl bg-[#1B3B2B] text-white space-y-4 shadow-md border border-[#D4AF37]/30 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FED65B] block">NEXT DUE DATE</span>
-                    <p className="font-serif font-bold text-2xl text-white mt-1">Nov 15, 2026</p>
-                    <p className="text-xs text-white/70 mt-0.5 font-sans">Installment: ₹500.00</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentModalOpen(true)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold uppercase tracking-wider hover:bg-[#e9c349] transition-colors cursor-pointer shadow-sm"
-                  >
-                    Pay Online →
-                  </button>
-                </div>
-              </div>
-
-              {/* Payment History Table */}
-              <div className="p-6 sm:p-8 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-5 shadow-xs">
-                <div className="flex items-center justify-between border-b border-[#1B3B2B]/10 pb-4">
-                  <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Payment History</h3>
-                  <button type="button" onClick={() => alert("Downloading statement...")} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#1B3B2B] text-[#1B3B2B] text-xs font-semibold hover:bg-gray-50">
-                    <Download className="w-3.5 h-3.5" /> Download Statement
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-left">
-                    <thead>
-                      <tr className="border-b border-[#1B3B2B]/10 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
-                        <th className="py-3">RECEIPT #</th>
-                        <th className="py-3">DATE</th>
-                        <th className="py-3">AMOUNT</th>
-                        <th className="py-3">MODE</th>
-                        <th className="py-3">STATUS</th>
-                        <th className="py-3 text-right">ACTION</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#1B3B2B]/10">
-                      {[
-                        { receipt: "RCP-2026-089", date: "Sep 01, 2026", amount: "₹1,500.00", isFailed: false, mode: "Online UPI / GPay", status: "Successful", badge: "bg-emerald-100 text-emerald-800" },
-                        { receipt: "RCP-2026-042", date: "Jul 15, 2026", amount: "₹1,000.00", isFailed: false, mode: "Bank Transfer", status: "Successful", badge: "bg-emerald-100 text-emerald-800" },
-                        { receipt: "RCP-2026-090", date: "Sep 01, 2026", amount: "₹500.00", isFailed: true, mode: "Online NetBanking", status: "Failed", badge: "bg-rose-100 text-rose-700" },
-                      ].map((row, idx) => (
-                        <tr key={idx} className="hover:bg-[#1B3B2B]/5 transition-colors">
-                          <td className="py-4 font-mono font-medium text-[#1B3B2B]">{row.receipt}</td>
-                          <td className="py-4 text-[#1B3B2B]">{row.date}</td>
-                          <td className={`py-4 font-bold ${row.isFailed ? "text-rose-600" : "text-[#1B3B2B]"}`}>{row.amount}</td>
-                          <td className="py-4 text-[#1B3B2B]">{row.mode}</td>
-                          <td className="py-4"><span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.badge}`}>{row.status}</span></td>
-                          <td className="py-4 text-right">
-                            <button type="button" onClick={() => alert(`Downloading Receipt #${row.receipt}`)} className="p-1.5 rounded-lg text-[#1B3B2B] hover:bg-[#1B3B2B]/10">
-                              <FileCheck className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="p-6 rounded-2xl bg-[#1B3B2B] text-white space-y-4 border border-[#D4AF37]/30">
+                  <span className="text-[10px] font-bold uppercase text-[#FED65B] block">NEXT DUE DATE</span>
+                  <p className="font-serif font-bold text-2xl text-white">Nov 15, 2026</p>
+                  <button type="button" onClick={() => setPaymentModalOpen(true)} className="w-full py-2.5 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold">Pay Online →</button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 7: CERTIFICATES */}
+          {/* TAB 12: CERTIFICATES */}
           {activeTab === "certificates" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="space-y-1">
-                <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Certificates</h2>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex items-center gap-4 shadow-xs">
-                  <div className="w-12 h-12 rounded-full bg-[#1B3B2B]/5 flex items-center justify-center text-[#1B3B2B]">
-                    <Award className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">TOTAL EARNED</span>
-                    <p className="font-serif font-bold text-3xl text-[#1B3B2B]">2</p>
-                  </div>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 flex items-center gap-4 shadow-xs">
-                  <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center text-[#92400E]">
-                    <Clock className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">IN PROGRESS</span>
-                    <p className="font-serif font-bold text-3xl text-[#1B3B2B]">1</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-5 pt-2">
-                <h3 className="font-serif font-bold text-2xl text-[#1B3B2B]">Earned Certificates</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-6 rounded-2xl bg-[#F5EFE6] border-2 border-[#D4AF37]/50 flex flex-col sm:flex-row gap-6 shadow-xs">
-                    <div className="w-full sm:w-36 h-48 rounded-xl bg-white border border-[#1B3B2B]/20 p-2 shrink-0 flex items-center justify-center text-center">
-                      <span className="font-serif text-xs font-bold text-[#1B3B2B]">شهادة تقدير وإجازة</span>
-                    </div>
-                    <div className="space-y-4 flex-1 flex flex-col justify-between">
-                      <div>
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold uppercase">
-                          COURSE COMPLETION
-                        </span>
-                        <h4 className="font-serif font-bold text-xl text-[#1B3B2B] mt-2">Tajweed Rules & Recitation</h4>
-                        <p className="text-xs text-muted-foreground mt-1">Awarded for demonstrating proficiency in Quranic recitation rules.</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button type="button" onClick={() => alert("Downloading PDF...")} className="flex-1 py-2 px-3 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold flex items-center justify-center gap-1.5">
-                          <Download className="w-3.5 h-3.5 text-[#FED65B]" /> Download PDF
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* OTHER TABS (DIGITAL LIBRARY, ASSIGNMENTS, ONLINE TESTS, LIVE CLASSES, COURSES) */}
-          {activeTab === "library" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Digital Library</h2>
-              <p className="text-xs text-muted-foreground">Access our curated collection of reference books and study materials.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { title: "Principles of Islamic Jurisprudence", category: "REFERENCE", size: "4.2 MB", date: "Oct 12, 2023" },
-                  { title: "Morning & Evening Supplications", category: "DAILY DUAS", size: "1.8 MB", date: "Nov 05, 2023" },
-                  { title: "History of the Prophets", category: "REFERENCE", size: "8.5 MB", date: "Dec 20, 2023" },
-                ].map((item, idx) => (
-                  <div key={idx} className="p-6 rounded-2xl bg-[#F5EFE6] border border-[#1B3B2B]/10 space-y-4">
-                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#EFE9DD] text-[#4A4237]">{item.category}</span>
-                    <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">{item.title}</h3>
-                    <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t border-[#1B3B2B]/10">
-                      <span>{item.size}</span>
-                      <span>{item.date}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "assignments" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Assignments</h2>
+              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Certificates</h2>
               <div className="p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
-                <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Fiqh al-Ibadat: Purification</h3>
-                <p className="text-xs text-muted-foreground">Due: Oct 25, 11:59 PM • 50 Marks</p>
-                <p className="text-xs text-[#1B3B2B]/80 leading-relaxed">
-                  Please write a comprehensive essay (1500 words) detailing the conditions and pillars of Wudu (ablution) according to the Hanafi school of thought. Include evidences from the Quran and Sunnah.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "tests" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Online Examinations & Quizzes</h2>
-              <div className="p-6 rounded-2xl bg-[#F5EFE6] border space-y-4">
-                <h3 className="font-serif font-bold text-xl text-[#1B3B2B]">Tajweed Makharij & Sifat Online Quiz</h3>
-                <button type="button" onClick={() => alert("Starting Quiz...")} className="px-6 py-2.5 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold">Start Quiz →</button>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "courses" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">My Courses</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { title: "Alimiyya Degree Course (Year 2)", instructor: "Muftia Fatima Ali Hashmi" },
-                  { title: "Tajweed & Qirat - Level 2", instructor: "Ustadha Ayesha" },
-                  { title: "Arabic Grammar (Nahw)", instructor: "Ustadha Fatima" },
-                ].map((c, i) => (
-                  <div key={i} className="p-6 rounded-2xl bg-[#F5EFE6] border space-y-3">
-                    <h4 className="font-serif font-bold text-xl text-[#1B3B2B]">{c.title}</h4>
-                    <p className="text-xs text-muted-foreground">Instructor: {c.instructor}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "live-classes" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <h2 className="font-serif font-bold text-3xl text-[#1B3B2B]">Live Interactive Classrooms</h2>
-              <div className="p-8 rounded-2xl bg-[#1B3B2B] text-white space-y-4">
-                <span className="px-3 py-1 rounded-full bg-red-500 text-xs font-bold uppercase">LIVE NOW</span>
-                <h3 className="font-serif text-3xl font-bold">Advanced Fiqh Studies</h3>
-                <p className="text-xs text-white/80">Shaykh Abdullah Al-Mahmoud • 06:00 PM - 07:30 PM (IST)</p>
-                <a href="https://zoom.us" target="_blank" rel="noreferrer" className="inline-block px-6 py-3 rounded-xl bg-[#D4AF37] text-[#1B3B2B] text-xs font-bold uppercase">Join Live Class →</a>
+                <h4 className="font-serif font-bold text-xl text-[#1B3B2B]">Tajweed Rules & Recitation Completion Sanad</h4>
+                <button type="button" onClick={() => alert("Downloading PDF...")} className="px-5 py-2 rounded-xl bg-[#1B3B2B] text-white text-xs font-bold">Download PDF</button>
               </div>
             </div>
           )}
